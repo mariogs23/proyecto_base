@@ -1,5 +1,7 @@
-//funciones que modifican el index
+
 var url="http://127.0.0.1:1338/";
+
+//Funciones que modifican el index
 
 function inicio(){
 	mostrarCabecera();
@@ -11,30 +13,41 @@ function borrarControl(){
 
 function mostrarCabecera(){
 	$('#cabecera').remove();
-	$('#control').append('<div id="cabecera"> <h2>Panel de Control</h2> <input type ="text" id="nombre" placeholder="introduce tu nombre"> </div>');
+	$('#control').append('<p id="cabecera"><h2>Panel de  Control</h2><input type="text" id="nombre" placeholder="introduce tu nombre"></p>');
 	botonNombre();
 }
 
-
 function botonNombre(){
-	
-	$('#cabecera').append('<button type="button" id="nombreBtn" class="btn btn-primary btn-md">Medium</button>');
+	var nombre="";
+	$('#control').append('<button type="button" id="nombreBtn" class="btn btn-primary btn-md">Iniciar partida</button>');
 	$('#nombreBtn').on('click',function(){
-		$('#nombreBtn').remove();
-		crearUsuario($('#nombre').val());
+		nombre=$('#nombre').val();
+		$('#nombre').remove();
+		$('#nombreBtn').remove();		
+		crearUsuario(nombre);
 	});
-};
+}
 
-//funciones de coumnicacion con el servidor
+function mostrarInfoJugador(datos){
+	$('#datos').remove();
+	$('#cabecera').append('<div id="datos">Nombre: '+datos.nombre+' Nivel: '+datos.nivel+' Id:'+datos.id+'</div>');
+}
+
+//Funciones de comunicación con el servidor
 
 function crearUsuario(nombre){
-	if (nombre=""){
-		nombre="jugador"
+	if (nombre==""){
+		nombre="jugador";
 	}
 	$.getJSON(url+'crearUsuario/'+nombre,function(datos){
-		//datos tiene la respuesta del servidor
-		//mostrar los datos del usuario
+		mostrarInfoJugador(datos);
 	});
-	//lo que ponga aquí se va a ejecutar en un momento que no puedo controlar
-
+	//mostrar datos
 }
+/*
+function crearNivel(nombre){
+	$.getJSON(url+'crearUsuario/'+nombre,function(datos){
+		mostrarInfoJugador(datos);
+	});
+	//mostrar datos
+}*/
