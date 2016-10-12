@@ -43,11 +43,15 @@ function crearNivel(){
         ground.body.immovable = true;
 
         //  Now let's create two ledges
-        var ledge = platforms.create(400, 400, 'ground');
+        var ledge = platforms.create(300, 400, 'ground');
         ledge.body.immovable = true;
 
         ledge = platforms.create(-150, 250, 'ground');
         ledge.body.immovable = true;
+
+        ledge = platforms.create(350, 200, 'ground');
+        ledge.body.immovable = true;
+
 
         // The player and its settings
         player = game.add.sprite(32, game.world.height - 150, 'dude');
@@ -57,7 +61,7 @@ function crearNivel(){
 
         //  Player physics properties. Give the little guy a slight bounce.
         player.body.bounce.y = 0.2;
-        player.body.gravity.y = 300;
+        player.body.gravity.y = 400;
         player.body.collideWorldBounds = true;
 
         //  Our two animations, walking left and right.
