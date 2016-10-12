@@ -1,5 +1,5 @@
 
-var url="http://127.0.0.1:1338/";
+var url="https://pasaniveles.herokuapp.com/";
 
 //Funciones que modifican el index
 
@@ -22,7 +22,7 @@ function botonNombre(){
 	$('#control').append('<button type="button" id="nombreBtn" class="btn btn-primary btn-md">Iniciar partida</button>');
 	$('#nombreBtn').on('click',function(){
 		nombre=$('#nombre').val();
-		$('#nombre').remove();
+		$(d#nombre').remove();
 		$('#nombreBtn').remove();		
 		crearUsuario(nombre);
 	});
