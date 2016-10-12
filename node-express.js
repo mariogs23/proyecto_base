@@ -15,7 +15,7 @@ app.use(exp.static(__dirname +"/cliente"));
 app.get("/",function(request,response){
 	var contenido=fs.readFileSync("./cliente/index.html");
 	response.setHeader("Content-type","text/html");
-	response.send(contenido);
+	response.send(contenido);//Envia el contenido del index.html al cliente, cuado éste realiza una petición
 });
 
 app.get('/crearUsuario/:nombre',function(request,response){
