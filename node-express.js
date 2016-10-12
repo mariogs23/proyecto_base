@@ -29,5 +29,4 @@ app.get('/crearUsuario/:nombre',function(request,response){
 })
 
 console.log("Servidor escuchando en el puerto "+port);
-app.listen(port,host);
-
+app.listen(process.env.PORT || 1338);
