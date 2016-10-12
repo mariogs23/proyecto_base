@@ -43,7 +43,7 @@ function crearNivel(){
         ground.body.immovable = true;
 
         //  Now let's create two ledges
-        var ledge = platforms.create(300, 400, 'ground');
+        var ledge = platforms.create(300, 450, 'ground');
         ledge.body.immovable = true;
 
         ledge = platforms.create(-150, 250, 'ground');
