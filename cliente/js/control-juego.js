@@ -22,7 +22,7 @@ function botonNombre(){
 	$('#control').append('<button type="button" id="nombreBtn" class="btn btn-primary btn-md">Iniciar partida</button>');
 	$('#nombreBtn').on('click',function(){
 		nombre=$('#nombre').val();
-		$(d#nombre').remove();
+		$('#nombre').remove();
 		$('#nombreBtn').remove();		
 		crearUsuario(nombre);
 	});
