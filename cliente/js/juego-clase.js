@@ -324,8 +324,12 @@
         star.kill();
 
         //  Add and update the score
-        score += 10;
-        scoreText.text = 'Score: ' + score;
+        player.vidas = player.vidas-1;
+        scoreText.text = 'Vidas: ' + player.vidas;
+
+        if(player.vidas<=0){
+            scoreText.text = 'Has muerto';
+        }
 
 
 
