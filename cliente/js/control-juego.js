@@ -35,9 +35,14 @@ function crearUsuario(nombre){
 		nombre="jugador";
 	}
 	$.getJSON(url+'crearUsuario/'+nombre,function(datos){
+		$cookie('nombre',datos.nombre);
+		$cookie('id',datos.id);
+		$cookie('nivel',datos.nivel);
 		mostrarInfoJugador(datos);
 		crearNivel(datos);
-	});
+	}
+
+	);
 	//mostrar datos
 	
 	
