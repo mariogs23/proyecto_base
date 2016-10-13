@@ -5,6 +5,7 @@
 
     var stars;
     var score = 0;
+    var vidas = 5;
     var scoreText;
     var game;
 
