@@ -28,6 +28,18 @@ app.get('/crearUsuario/:nombre',function(request,response){
 	response.send({'nombre':usuario.nombre,'nivel':usuario.nivel,'id':usuario.id});
 });
 
+app.get('/nivelCompletado/:id',function(request,response){
+	var id=request.params.id;
+	var usuario=juego.obtenerUsuario(id);
+	usuario.nivel+=1;
+	console.log(usuario);
+	if (usuario!=undefined){		
+		json={'nivel':usuario.nivel};
+	}
+	response.send(json);
+});
+
+
 app.get('/comprobarUsuario/:id',function(request,response){
 	var id=request.params.id;
 	var usuario=juego.obtenerUsuario(id);
