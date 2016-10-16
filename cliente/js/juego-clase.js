@@ -6,8 +6,11 @@
     var stars;
     var vidas = 5;
     var vidasText;
+    var secondText;
     var finText;
     var game;
+    var gameFinish= false;
+    var timer=0;
 
     function crearNivel(nivel){
     
@@ -43,7 +46,7 @@
 
 
     function create0() {
-
+        game.time.events.loop(Phaser.Timer.SECOND, updateCounter, this);
         //  We're going to be using physics, so enable the Arcade Physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -58,7 +61,7 @@
         cielo.enableBody = true;
 
         var fin=cielo.create(0,0,'cielo');
-        fin.scale.setTo(2,1);
+        fin.scale.setTo(2,0.1);
 
         // Here we create the ground.
         var ground = platforms.create(0, game.world.height - 64, 'ground');
@@ -102,69 +105,83 @@
         stars.enableBody = true;
 
         //  Here we'll create 12 of them evenly spaced apart
-        for (var i = 0; i < 12; i++)
+        for (var i = 0; i < 7; i++)
         {
-            //  Create a star inside of the 'stars' group
-            var star = stars.create(i * 70, 0, 'star');
-
-            //  Let gravity do its thing
-            star.body.gravity.y = 300;
-
-            //  This just gives each star a slightly random bounce value
-            star.body.bounce.y = 0.7 + Math.random() * 0.2;
+            generateStar();
         }
 
         //  The vidas
         vidasText = game.add.text(16, 16, 'vidas: ' +vidas, { fontSize: '32px', fill: '#fff' });
-        finText = game.add.text(200, 200, '', { fontSize: '60px', fill: '#fff'});
-
+        secondText = game.add.text(16, 50, 'tiempo: 0', { fontSize: '32px', fill: '#fff' });
+        finText = game.add.text(200,200, '', { fontSize: '60px', fill: "#ffffff", align: "center" });
         //  Our controls.
         cursors = game.input.keyboard.createCursorKeys();
         
     }  
 
+    
 
     function update() {
 
+        
+
         //  Collide the player and the stars with the platforms
         game.physics.arcade.collide(player, platforms);
-        game.physics.arcade.collide(stars, platforms);
-
-        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        game.physics.arcade.overlap(player, stars, collectStar, null, this);
-
-        game.physics.arcade.overlap(player, cielo, terminaNivel, null, this);
-
-        //  Reset the players velocity (movement)
-        player.body.velocity.x = 0;
-
-        if (cursors.left.isDown)
-        {
-            //  Move to the left
-            player.body.velocity.x = -150;
-
-            player.animations.play('left');
-        }
-        else if (cursors.right.isDown)
-        {
-            //  Move to the right
-            player.body.velocity.x = 150;
-
-            player.animations.play('right');
-        }
-        else
-        {
-            //  Stand still
-            player.animations.stop();
-
-            player.frame = 4;
-        }
         
-        //  Allow the player to jump if they are touching the ground.
-        if (cursors.up.isDown && player.body.touching.down)
-        {
-            player.body.velocity.y = -350;
+        //game.physics.arcade.collide(stars, platforms);
+        
+        if(!gameFinish){
+            //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+            game.physics.arcade.overlap(player, stars, collectStar, null, this);
+
+            game.physics.arcade.overlap(player, cielo, terminaNivel, null, this);
+
+            game.physics.arcade.overlap(platforms, stars, finEstrella, null, this);
+            //  Reset the players velocity (movement)
+            player.body.velocity.x = 0;
+
+        
+            if (cursors.left.isDown)
+            {
+                //  Move to the left
+                player.body.velocity.x = -150;
+
+                player.animations.play('left');
+            }
+            else if (cursors.right.isDown)
+            {
+                //  Move to the right
+                player.body.velocity.x = 150;
+
+                player.animations.play('right');
+            }
+            else
+            {
+                //  Stand still
+                player.animations.stop();
+
+                player.frame = 4;
+            }
+            
+            //  Allow the player to jump if they are touching the ground.
+            if (cursors.up.isDown && player.body.touching.down)
+            {
+                player.body.velocity.y = -350;
+            }
         }
+
+    }
+
+     function generateStar () {
+    
+        //  Create a star inside of the 'stars' group
+            var star = stars.create((Math.random() * 11) * 70, 0, 'star');
+
+            //  Let gravity do its thing
+            star.body.gravity.y = 100;
+
+            //  This just gives each star a slightly random bounce value
+            //star.body.bounce.y = 0.7 + Math.random() * 0.2;
 
     }
 
@@ -173,6 +190,8 @@
         // Removes the star from the screen
         star.kill();
 
+        generateStar();
+
         //  Add and update the vidas
         vidas = vidas-1;
         vidasText.text = 'vidas: ' + vidas;
@@ -180,6 +199,7 @@
         if(vidas<=0){
             vidasText.text ='';
             finText.text = '¡¡Has muerto!!';
+            gameFinish= true;
         }
 
     }
@@ -188,8 +208,30 @@
         
         //Llamar a nivel completado con el tiempo y las vidas 
         //Matar al jugador
-        console.log("NivelCompletado");
+        if (!gameFinish){
+            finText.text = '¡¡Nivel Completado!!';
+            gameFinish= true;
+            nivelCompletado(timer);
+        }
 
 
+
+    }
+
+
+    function finEstrella (platforms, star) {
+        
+        star.kill();
+        generateStar();
+
+    }
+
+    function updateCounter() {
+
+        if(!gameFinish){
+            timer=timer+1;
+        }
+        
+        secondText.setText('tiempo: ' + timer);
 
     }

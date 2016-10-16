@@ -1,6 +1,6 @@
 
-var url="https://pasaniveles.herokuapp.com/";
-//var url="http://127.0.0.1:1338/";
+//var url="https://pasaniveles.herokuapp.com/";
+var url="http://127.0.0.1:1338/";
 
 //Funciones que modifican el index
 
@@ -81,6 +81,10 @@ function siguienteNivel(){
 		//('#juegoId').append('<script id="nivel">crearNivel()</script>');
 	});
 
+}
+
+function nivelCompletado(timer){
+	
 }
 
 function comprobarUsuario(){
