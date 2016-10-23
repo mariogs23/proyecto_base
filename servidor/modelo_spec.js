@@ -46,4 +46,6 @@ describe("El juego niveles incialmente...",function(){
 		expect(juego.resultados[0].nivel).toEqual(0);
 		expect(juego.resultados[0].tiempo).toEqual(11);
 	})
+
+	//Para cada funcionalidad que se incorpore, se realizarán las pruebas correspondientes
 })

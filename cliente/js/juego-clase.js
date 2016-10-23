@@ -33,7 +33,9 @@ function preload() {
         game.load.image('ground', 'assets/platform.png');
         game.load.image('ground2', 'assets/platform2.png');
         game.load.image('meteorito', 'assets/meteorito.png');
+        game.load.image('explosion', 'assets/explosion.png');
         game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+        game.load.spritesheet('dude2', 'assets/dude2.png', 32, 48);
         game.load.image('cielo','assets/heaven.png');
 }
 
@@ -193,10 +195,13 @@ function updateTiempo(){
 
 function collectMeteorito (player, meteorito) {       
         // Removes the Meteorito from the screen
+       
+        meteorito.loadTexture('explosion');
         meteorito.kill();
 
         //  Add and update the score
         player.vidas=player.vidas-1;
+        player.loadTexture('dude2');
         scoreText.text = 'Vidas: ' + player.vidas;
         if (player.vidas==0){
             player.kill();
@@ -213,6 +218,7 @@ function terminaNivel(player,final){
 }
 
 function muereMeteorito(platform,meteorito){
+    meteorito.loadTexture('explosion');
     meteorito.kill();
     lanzarMeteorito();
 }

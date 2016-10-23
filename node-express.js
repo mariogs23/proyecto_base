@@ -4,10 +4,12 @@ var config=JSON.parse(fs.readFileSync("config.json"));
 var host=config.host;
 var port=config.port;
 var exp=require("express");
+var mongo=require("mongodb");
 var app=exp(); 
 var modelo=require('./servidor/modelo.js');
 
 var juego= new modelo.Juego();
+var usuariosCol;
 
 //app.use(app.router);
 app.use(exp.static(__dirname +"/cliente"));
@@ -16,6 +18,7 @@ app.get("/",function(request,response){
 	var contenido=fs.readFileSync("./cliente/index-nav.html");
 	response.setHeader("Content-type","text/html");
 	response.send(contenido);
+	insertar({nombre:"Pepe", email:"pe@pe.es",clave:"pepe"});
 });
 
 app.get('/crearUsuario/:nombre',function(request,response){
@@ -62,7 +65,31 @@ app.get('/obtenerResultados/:id',function(request,response){
 	response.send(json);
 })
 
+
 console.log("Servidor escuchando en el puerto "+port);
 //app.listen(port,host);
 app.listen(process.env.PORT || 1338);
+
+var db= new mongo.Db("usuarioscn", new mongo.Server("127.0.0.1","27017",{}));
+
+db.open(function(error){
+	console.log("Conectado a mongo: usuarioscn");
+	db.collection("usuarios", function(err, col){
+		console.log("tenemos la colección");
+		usuariosCol=col;
+	})
+})
+
+
+
+
+function insertar(usu){
+	usuariosCol.insert(usu,function(err){
+		if(err){
+			console.log("error");
+		}else{
+			console.log("Nuevo usuario Creado");
+		}
+	})
+}
 
