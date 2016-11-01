@@ -13,7 +13,7 @@ function Juego(){
 	}
 	this.obtenerUsuario=function(id){
 		return _.find(this.usuarios,function(usu){
-			return usu.id==id
+			return usu._id==id
 		});
 	}
 	this.agregarResultado=function(resultado){
@@ -29,6 +29,8 @@ function Usuario(nombre){
 	this.id=new Date().valueOf();
 	this.nombre=nombre;
 	this.nivel=0;
+	this.password=undefined;
+	this.email=nombre;
 }
 
 function Resultado(nombre,nivel,tiempo){

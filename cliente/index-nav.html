@@ -1,41 +1,47 @@
-<html> 
-<html lang="en"> 
-<head> 
-	<meta charset="UTF-8" />
-    <title>Conquista Niveles</title>
+<html>
+<html lang="en">
+<head>
+  <title>Conquista Niveles</title>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script src="lib/jquery.cookie.js"></script>
-	<script type="text/javascript" src="lib/phaser.min.js"></script>
+  <script type="text/javascript" src="lib/jquery.cookie.js"></script>
+  <script type="text/javascript" src="lib/phaser.min.js"></script>
+  <script type="text/javascript" src="js/coordenadas.js"></script>
+  <script type="text/javascript" src="js/control-juego.js"></script>
+  <script type="text/javascript" src="js/juego-clase.js"></script>
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon.ico">
 </head>
-<body>
+<body>  
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href="/">
-        <span><img alt="Brand" src="assets/brand.png"></span> Conquista Niveles
-      </a>
+      <a class="navbar-brand" href="#" id="ini1" onclick="comprobarUsuario();">Conquista Niveles</a>
     </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="#" id="ini2" onclick="comprobarUsuario();">Inicio</a></li>
+      <li><a href="#" id="resul" onclick="obtenerResultados();">Resultados</a></li>
+      <li><a href="#" onclick="mostrarActualizarEliminar();">Modificar perfil</a></li>
+      <li><a href="#" onclick="reset();">Salir</a></li>
+    </ul>
   </div>
 </nav>
-<div class="container">
-  <div class="row">
-    <div class="col-sm-3">
-      <div id="control">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4">
+        <h3 id="cabecera">Nombre jugador</h3>
+        <div id="control"></div>
+      </div>
+      <div class="col-sm-8" id="canvas">
+       <div id="juegoId"></div>
+       <div id="resultados"></div>
       </div>
     </div>
-    <div class="col-sm-9">
-      <div id="juegoId"></div>
-    </div>
   </div>
-</div>
-<script src="js/control-juego.js"></script>
-<script src="js/coordenadas.js"></script>
-<script src="js/juego-clase.js"></script>
-<script>
-    inicio();
-</script>
+  <script type="text/javascript">
+      comprobarUsuario();
+  </script>
 </body>
 </html>

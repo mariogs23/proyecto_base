@@ -1,156 +1,364 @@
 
-var url="http://127.0.0.1:1338/";
-//var url="https://pasaniveles.herokuapp.com/";
+//var url="http://127.0.0.1:1338/";
+var url="https://pasaniveles.herokuapp.com/";
+
+var nombre;
+var nivel=-1;
 var game;
 
-//Funciones que modifican el index
+// function cabecera(){
+//   $('#cabecera').remove();
+//   $('#inicio').append('<h3 id="cabecera">Nombre jugador</h3>');
+// }
 
-function inicio(){
-	if ($.cookie("nombre")!=undefined)
-	{
-		comprobarUsuario();
-	}
-	else{
-		mostrarCabecera();
-	}
+function comprobarUsuario(){
+  eliminarCabeceras();
+  if ($.cookie("uid")!=undefined)
+  {
+    srvComprobarUsuario();
+  }
+  else{
+    mostrarLogin();
+  }
+ }
+
+function mostrarLogin(){
+  borrarLogin();
+  limpiar();
+  $('#control').append('<p id="login"><h2 id="cabeceraP">Inicio de sesión</h2><input type="text" id="email" class="form-control" placeholder="introduce tu email" required><input type="password" id="clave" class="form-control" placeholder="introduce tu clave" required></p>');
+  $('#control').append('<button type="button" id="nombreBtn" class="btn btn-primary btn-md">Iniciar partida</button> <a href="#" id="refRegistro" onclick="mostrarRegistro();">Registrar usuario</a>');
+  $('#nombreBtn').on('click',function(){
+    var nombre=$('#email').val();
+    var clave=$('#clave').val();
+    $('#nombre').remove();
+    $('#nombreBtn').remove();   
+    loginUsuario(nombre,clave);
+  });
 }
 
-function borrarControl(){
-	$('#control').remove();
+function mostrarRegistro(){
+  borrarLogin();
+  limpiar();
+  $('#control').append('<p id="cabecera"><h2 id="cabeceraP">Registro de usuarios</h2><input type="text" id="email" class="form-control" placeholder="introduce tu email"><input type="text" id="clave" class="form-control" placeholder="introduce tu clave"></p>');
+  $('#control').append('<button type="button" id="nombreBtn" class="btn btn-primary btn-md">Registrar usuario</button>');
+  $('#nombreBtn').on('click',function(){
+    var nombre=$('#email').val();
+    var clave=$('#clave').val();
+    $('#nombre').remove();
+    $('#nombreBtn').remove();   
+    registroUsuario(nombre,clave);
+  });
 }
 
-function mostrarCabecera(){
-	$('#cabecera').remove();
-	$('#enh').remove();
-	$('#datos').remove();
-	$('#prog').remove();
-	$('#control').append('<p id="cabecera"><h2 id="cabeceraP">Panel de  Control</h2><input type="text" id="nombre" placeholder="introduce tu nombre"></p>');
-	botonNombre();
+function mostrarActualizarEliminar(){
+  borrarLogin();
+  limpiar();
+  if ($.cookie('uid')!=undefined)
+  {
+    $('#control').append('<p id="cabecera"><h2 id="cabeceraP">Actualizar datos usuario</h2><input type="text" id="email" class="form-control" placeholder="Email: '+$.cookie("email")+'"><input type="text" id="nombre" class="form-control" placeholder="Nombre: '+$.cookie("nombre")+'"><input type="text" id="newpass" class="form-control" placeholder="introduce tu nueva clave"></p>');
+    $('#control').append('<button type="button" id="actualizarBtn" class="btn btn-primary btn-md">Actualizar usuario</button> <button type="button" id="eliminarBtn" class="btn btn-danger btn-md">Eliminar usuario</button>');
+    $('#actualizarBtn').on('click',function(){
+      var email=$('#email').val();
+      var nombre=$('#nombre').val();
+      var newpass=$('#newpass').val();
+      $('#actualizarBtn').remove();   
+      actualizarUsuario(email,nombre,newpass);
+    });
+    $('#eliminarBtn').on('click',function(){
+      var nombre=$('#email').val();
+      //var clave=$('#clave').val();
+      $('#nombre').remove();
+      $('#eliminarBtn').remove();   
+      eliminarUsuario(nombre);
+    });
+  }
+  else{
+    mostrarLogin();
+  }
 }
 
-function botonNombre(){
-	var nombre="";
-	$('#control').append('<button type="button" id="nombreBtn" class="btn btn-primary btn-md">Iniciar partida</button>');
-	$('#nombreBtn').on('click',function(){
-		nombre=$('#nombre').val();
-		$('#nombre').remove();
-		$('#nombreBtn').remove();		
-		crearUsuario(nombre);
-	});
+
+function borrarLogin(){
+  $('#login').remove();
+  $('#email').remove();
+  $('#clave').remove();
+  $('#nombreBtn').remove();
+  $('#cabeceraP').remove();
+}
+
+function limpiar(){
+  $('#datos').remove();
+  $('#cabeceraP').remove();
+  $('#cabecera').remove();
+  $('#prog').remove();
+  $('#cabecera').remove();
+  $('#enh').remove();
+  $('#siguienteBtn').remove();
+  $('#actualizarBtn').remove();
+  $('#eliminarBtn').remove();
+  $('#refRegistro').remove();
+  $('#oldpass').remove();
+  $('#newpass').remove();
 }
 
 function mostrarInfoJugador(){
-	var nombre=$.cookie("nombre");
-	var id=$.cookie("id");
-	var nivel=$.cookie("nivel");
-	var percen=Math.floor((nivel/3)*100);
-	$('#datos').remove();
-	$('#cabeceraP').remove();
-	$('#cabecera').remove();
-	$('#prog').remove();
-	$('#control').append('<div id="cabecera"><h2>Panel</h2></div>')
-	$('#control').append('<div id="datos"><h4>Nombre: '+nombre+'<br />Nivel: '+nivel+'</h4></div>');
-	$('#control').append('<div class="progress" id="prog"><div class="progress-bar" aria-valuemin="0" aria-valuemax="100" style="width:'+percen+'%">'+percen+'%</div></div>');
-	siguienteNivel();
+  var email=$.cookie("email");
+  var id=$.cookie("uid");
+  var nivel=$.cookie("nivel");
+  var nombre=$.cookie("nombre");
+  var percen=Math.floor((nivel/3)*100);
+  limpiar();
+  borrarLogin();
+  $('#control').append('<div id="cabecera"><h2>Panel de Control</h2></div>')
+  $('#control').append('<div id="datos"><h4>Email: '+email+'<br />Nombre: '+nombre+'<br />Nivel: '+nivel+'</h4></div>');
+  $('#control').append('<div class="progress" id="prog"><div class="progress-bar" aria-valuemin="0" aria-valuemax="100" style="width:'+percen+'%">'+percen+'%</div></div>');
+  siguienteNivel();
 }
 
 function siguienteNivel(){
-	$('#control').append('<button type="button" id="siguienteBtn" class="btn btn-primary btn-md">Siguiente nivel</button>')
-	$('#siguienteBtn').on('click',function(){
-		$('#siguienteBtn').remove();
-		$('#enh').remove();
-		$('#res').remove();
-  		$('#resultados').remove();
-		crearNivel($.cookie('nivel'));
-	});
-}
-
-function noHayNiveles(){
-	$('#juegoId').append("<h2 id='enh'>Lo siento, no tenemos más niveles</h2>");
-	$('#control').append('<button type="button" id="siguienteBtn" class="btn btn-primary btn-md">Volver a empezar</button>')
-	$('#siguienteBtn').on('click',function(){
-		$('#siguienteBtn').remove();
-		reset();
-	});
-}
-
-function nivelCompletado(tiempo){
-	//game.destroy();
-	game.destroy();
-	$('#juegoId').append("<h2 id='enh'>Enhorabuena!</h2>");
-	comunicarNivelCompletado(tiempo);
-	obtenerResultados();
+  $('#control').append('<button type="button" id="siguienteBtn" class="btn btn-primary btn-md">Siguiente nivel</button>')
+  $('#siguienteBtn').on('click',function(){
+    $('#siguienteBtn').remove();
+    $('#enh').remove();
+    $('#res').remove();
+    $('#resultados').remove();
+    if ($('#juegoId').length==0){
+      $('#canvas').append('<div id="juegoId"></div>');
+    }
+    crearNivel($.cookie('nivel'));
+  });
 }
 
 function mostrarResultados(datos){
-  //eliminarGame();
+  eliminarGame();
   //eliminarCabeceras();
+  $('#juegoId').remove();
   $('#res').remove();
   $('#resultados').remove();
-  $('#juegoId').append('<h3 id="res">Resultados</h3>');
-  var cadena="<table id='resultados' class='table table-bordered table-condensed'><tr><th>Nombre</th><th>Nivel</th><th>Tiempo</th></tr>";
+  $('#canvas').append('<h3 id="res">Resultados</h3>');
+  var cadena="<table id='resultados' class='table table-bordered table-condensed'><tr><th>Nombre</th><th>Email</th><th>Nivel</th><th>Tiempo</th></tr>";
     for(var i=0;i<datos.length;i++){
-      cadena=cadena+"<tr><td>"+datos[i].nombre+"</td><td> "+datos[i].nivel+"</td>"+"</td><td> "+datos[i].tiempo+"</td></tr>";      
+      cadena=cadena+"<tr><td>"+datos[i].nombre+"</td><td>"+datos[i].email+"</td><td> "+datos[i].nivel+"</td>"+"</td><td> "+datos[i].tiempo+"</td></tr>";      
     }
     cadena=cadena+"</table>";
-    $('#juegoId').append(cadena);
+    $('#canvas').append(cadena);
+}
+
+function noHayNiveles(){
+  //$("#juegoId").remove();
+  $('#reset').remove();
+  $('#control').append('<p id="reset"><button id="reset" type="button" class="btn btn-primary btn-lg">Volver a jugar</button></p>');
+  $('#reset').on("click",function(){
+      $('#reset').remove();
+      $('#canvas').append('<div id="juegoId"></div>');
+      reset();
+      /*
+      $.getScript("js/nivel2.js", function(){
+        //Stuff to do after someScript has loaded
+        console.log("ok");
+      });
+      //empezar(nombre);
+      */
+     });
+}
+
+function eliminarCabeceras(){
+  $('#resultados').remove();
+  $('#res').remove();
+  $('#cabecera').remove();
+  $('#nombre').remove();
+  $('#crear').remove();
+  $('#nivel').remove();
+  $('#help').remove();  
+  $('#reset').remove();
+  $('#siguienteBtn').remove();
+  $('#juegoId').remove();
+  eliminarGame();
 }
 
 function reset(){
-	borrarCookies();
-	mostrarCabecera();
+  eliminarCabeceras();
+  eliminarCookies();
+  eliminarGame();
+  //iniciar();
+  comprobarUsuario();
 }
 
-function borrarCookies(){
-	$.removeCookie("nombre");
-	$.removeCookie("id");
-	$.removeCookie("nivel");
+function eliminarGame(){
+  if (game && game.state!=null) {
+    game.destroy();
+    //game=undefined;
+  }
 }
 
-//Funciones de comunicación con el servidor
+function eliminarCookies(){
+  $.removeCookie("uid");
+  $.removeCookie("email");
+  $.removeCookie("nivel");
+  $.removeCookie('nombre');
+}
 
-function crearUsuario(nombre){
-	if (nombre==""){
-		nombre="jugador";
-	}
-	$.getJSON(url+'crearUsuario/'+nombre,function(datos){
-		$.cookie('nombre',datos.nombre);
-		$.cookie('id',datos.id);
-		$.cookie('nivel',datos.nivel);
-		mostrarInfoJugador();
+function nivelCompletado(tiempo){
+  //game.destroy();
+  //game.destroy();
+  eliminarGame();
+  $('#juegoId').append("<h2 id='enh'>Enhorabuena!</h2>");
+  comunicarNivelCompletado(tiempo);
+  obtenerResultados();
+}
+
+
+//Comunicaciones
+
+function srvComprobarUsuario(){
+  var id=$.cookie("uid");
+
+  $.getJSON(url+'comprobarUsuario/'+id,function(datos){
+    if (datos.nivel<0){
+      eliminarCookies();
+      //mostrarCabecera();
+      mostrarLogin();
+    }
+    else{
+      $.cookie("nivel",datos.nivel);
+      mostrarInfoJugador();
+    }
+  });
+}
+
+function loginUsuario(nombre,clave){
+  //var id=$.cookie("id");
+
+  $.ajax({
+    type:'POST',
+    url:'/login/',
+    data:JSON.stringify({email:nombre,password:clave}),
+    success:function(data){
+      if (data.email==""){
+        mostrarRegistro();
+      }
+      else{
+        $.cookie('nombre',data.nombre);
+        $.cookie('email',data.email);
+        $.cookie('uid',data._id);
+        $.cookie('nivel',data.nivel);
+        mostrarInfoJugador();
+       }
+      },
+    contentType:'application/json',
+    dataType:'json'
+  });
+}
+
+function registroUsuario(email, password){
+
+	$.ajax({
+		type:'POST',
+		url:'/singup/',
+		data:JSON.stringify({email:email, password:password}),
+		success:function(data){
+			if(data.email==undefined){
+				mostrarRegistro();
+			}else{
+				$.cookie('nombre',data.nombre);
+		        $.cookie('email',data.email);
+		        $.cookie('uid',data._id);
+		        $.cookie('nivel',data.nivel);
+				mostrarInfoJugador();
+			}
+		}, 
+		contentType:'application/json',
+		dataType:'json'
 	});
-	//mostrar datos
 }
 
-function comprobarUsuario(){
-	var id=$.cookie("id");
 
-	$.getJSON(url+'comprobarUsuario/'+id,function(datos){
-		if (datos.nivel<0){
-			borrarCookies();
-			mostrarCabecera();
-		}
-		else{
-			$.cookie("nivel",datos.nivel);
-			mostrarInfoJugador();
-		}
+function actualizarUsuario(email,nombre,newpass){
+  var nivel=$.cookie("nivel");
+ $.ajax({
+    type:'PUT',
+    url:'/actualizarUsuario/',
+    data:JSON.stringify({uid:$.cookie("uid"),email:email,nombre:nombre,newpass:newpass,nivel:nivel}),
+    success:function(data){
+      if (data.email==undefined){
+        mostrarRegistro();
+      }
+      else{
+        $.cookie('nombre',data.nombre);
+        $.cookie('email',data.email);
+        $.cookie('uid',data._id);
+        $.cookie('nivel',data.nivel);
+        //mostrarActualizarEliminar();
+        mostrarInfoJugador();
+      }
+      },
+    contentType:'application/json',
+    dataType:'json'
+  });
+}
+
+/*
+function actualizarUsuario(email,nombre,newpass){
+	
+	var nivel=$.cookie("nivel");
+
+	$.ajax({
+		type:'PUT',
+		url:'/actualizarUsuario/',
+		data:JSON.stringify({uid:$.cookie("uid"),email:email,nombre:nombre,newpass:newpass,nivel:nivel}),
+		success:function(data){
+			if(data.email==undefined){
+				mostrarRegistro();
+			}else{
+				$.cookie('nombre',data.nombre);
+		        $.cookie('email',data.email);
+		        $.cookie('uid',data._id);
+		        $.cookie('nivel',data.nivel);
+				mostrarInfoJugador();
+			}
+		}, 
+		contentType:'application/json',
+		dataType:'json'
 	});
 }
+*/
+
+function eliminarUsuario(){
+  $.ajax({
+    type:'DELETE',
+    url:'/eliminarUsuario/'+$.cookie("uid"),
+    data:'{}',
+    success:function(data){
+      if (data.resultados==1)
+      {
+        reset();
+      }
+      },
+    contentType:'application/json',
+    dataType:'json'
+  });
+}
+
 
 function comunicarNivelCompletado(tiempo){
-	var id=$.cookie("id");
+  var id=$.cookie("uid");
 
-	$.getJSON(url+'nivelCompletado/'+id+"/"+tiempo,function(datos){
-			$.cookie("nivel",datos.nivel);
-			mostrarInfoJugador();
-	});	
+  $.getJSON(url+'nivelCompletado/'+id+"/"+tiempo,function(datos){
+      $.cookie("nivel",datos.nivel);
+      mostrarInfoJugador();
+  }); 
 }
+
 
 function obtenerResultados(){
-	var id=$.cookie("id");
-
-	$.getJSON(url+'obtenerResultados/'+id,function(datos){
-			//$.cookie("nivel",datos.nivel);
-			mostrarResultados(datos);
-	});
+  var uid=$.cookie("uid");
+  if (uid!=undefined){
+    $.getJSON(url+"obtenerResultados/"+uid,function(data){           
+        mostrarResultados(data);
+    });
+  } 
 }
+
+
+
+
