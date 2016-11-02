@@ -8,6 +8,7 @@ var bodyParser=require("body-parser");
 var mongo=require("mongodb").MongoClient; 
 var app=exp(); 
 var modelo=require('./servidor/modelo.js');
+var ObjectID=require("mongodb").ObjectID;
 
 var juego= new modelo.Juego();
 var usuariosCol;
@@ -55,7 +56,7 @@ app.get('/nivelCompletado/:id/:tiempo',function(request,response){
 	var id=request.params.id;
 	var tiempo=request.params.tiempo;
 	var usuario=juego.obtenerUsuario(id);
-	juego.agregarResultado(new modelo.Resultado(usuario.nombre,usuario.nivel,tiempo));
+	juego.agregarResultado(new modelo.Resultado(usuario.nombre,usuario.email, usuario.nivel,tiempo));
 	usuario.nivel+=1;
 	console.log(juego.resultados);
 	if (usuario!=undefined){		
@@ -68,9 +69,13 @@ app.get('/obtenerResultados/:id',function(request,response){
 	var id=request.params.uid;
 	var usuario=juego.obtenerUsuario(id);
 	var json={'resultados':[]};
-	if (usuario){
+	/*if (usuario){
 		json=juego.resultados;
-	}
+		
+	}*/
+	json=juego.resultados;
+	console.log('resultados:');
+	console.log(json);
 	response.send(json);
 });
 
@@ -114,52 +119,66 @@ app.post('/singup',function(request,response){
 });
 
 
-app.put('/actualizarUsuario',function(request,response){
-	var email=request.body.email;
-	var password=request.body.password;
-	var id=request.body.uid;
-	var nombre=request.body.nombre;
-	var nivel=request.body.nivel;
-
-	
-	usuariosCol.update({id:id}, {nombre:nombre, nivel:nivel, email:email, password:password},function(err){
-		if(err){
-			console.log(err);
-			console.log("error");
-		}
-		else{
-			usuariosCol.find({email:email,password:password}).toArray(function(error,usr){
-				if(usr.length==0){
-					response.send({'email':undefined})
-				}else{
-					juego.agregarUsuario(usr[0]);
-					response.send(usr[0]);
-				}
-			})
-		}
-	});
+app.put("/actualizarUsuario",function(request,response){
+ //var uid=request.params.uid;
+ //var email=request.body.email;
+ var uid=request.body.uid;
+ //var nombre=request.body.nombre;
+ //var password=request.body.newpass;
+ //var nivel=parseInt(request.body.nivel);
+ var json={'email':undefined};
+ var usu=juego.obtenerUsuario(uid);
+ var usuario=comprobarCambios(request.body,usu);
+ usuariosCol.update({_id:ObjectID(uid)},usuario,function(err,result){
+   console.log(result);
+   if (result.result.nModified==0){
+     console.log("No se pudo actualizar");
+     response.send(json);
+   }
+   else{ 
+     usuariosCol.find({_id:ObjectID(uid)}).toArray(function(error,usr){
+      if (!error){
+         if (usr.length!=0){
+           json=usr[0];
+         } 
+      }
+     console.log("Usuario modificado");
+     console.log(json);
+     response.send(json);
+    });
+  }
+ });
 });
 
+function comprobarCambios(body,usu){
+ if (body.email!=usu.email && body.email!=""){
+   usu.email=body.email;
+ }
+ if (body.newpass!=usu.password && body.newpass!=""){
+   usu.password=body.newpass;
+ }
+   if (body.nombre!=usu.nombre && body.nombre!=""){
+   usu.nombre=body.nombre;
+ }
+ return usu;
+}
 
 
-app.delete('/eliminarUsuario/:id',function(request,response){
-	var id=request.params.id;
 
-	console.log(id);
-
-	usuariosCol.remove({id:id}, { justOne: true },function(err, result){
-		if(err){
-			console.log(err);
-			console.log("error");
-		}
-		else{
-			console.log("Usuario eliminado");
-			var resultados= result.numberReturned;
-			console.log(resultados);
-			//WriteResult({ "nRemoved" : 1 });
-			response.send(result);
-		}
-	});
+app.delete("/eliminarUsuario/:uid",function(request,response){
+ var uid=request.params.uid;
+ var json={'resultados':-1};
+ usuariosCol.remove({_id:ObjectID(uid)},function(err,result){
+  //console.log(result);
+  if (result.result.n==0){
+    console.log("No se pudo eliminar");
+  }
+  else{
+   json={"resultados":1};
+   console.log("Usuario eliminado");
+  }
+  response.send(json);
+ });
 });
 
 

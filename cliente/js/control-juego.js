@@ -39,7 +39,7 @@ function mostrarLogin(){
 function mostrarRegistro(){
   borrarLogin();
   limpiar();
-  $('#control').append('<p id="cabecera"><h2 id="cabeceraP">Registro de usuarios</h2><input type="text" id="email" class="form-control" placeholder="introduce tu email"><input type="text" id="clave" class="form-control" placeholder="introduce tu clave"></p>');
+  $('#control').append('<p id="cabecera"><h2 id="cabeceraP">Registro de usuarios</h2><input type="text" id="email" class="form-control" placeholder="introduce tu email" required><input type="password" id="clave" class="form-control" placeholder="introduce tu clave" required></p>');
   $('#control').append('<button type="button" id="nombreBtn" class="btn btn-primary btn-md">Registrar usuario</button>');
   $('#nombreBtn').on('click',function(){
     var nombre=$('#email').val();
@@ -84,6 +84,9 @@ function borrarLogin(){
   $('#clave').remove();
   $('#nombreBtn').remove();
   $('#cabeceraP').remove();
+  $('#newpass').remove();
+  $('#info').remove();
+  $('#nombre').remove();
 }
 
 function limpiar(){
@@ -99,6 +102,8 @@ function limpiar(){
   $('#refRegistro').remove();
   $('#oldpass').remove();
   $('#newpass').remove();
+  $('#tabla').remove();
+  $('#tabla_wrapper').remove();
 }
 
 function mostrarInfoJugador(){
@@ -129,7 +134,8 @@ function siguienteNivel(){
   });
 }
 
-function mostrarResultados(datos){
+
+/*function mostrarResultados(datos){
   eliminarGame();
   //eliminarCabeceras();
   $('#juegoId').remove();
@@ -142,6 +148,34 @@ function mostrarResultados(datos){
     }
     cadena=cadena+"</table>";
     $('#canvas').append(cadena);
+}*/
+
+function mostrarResultados(datos){
+  eliminarGame();
+
+  $('#tabla').remove();
+  $('#tabla_wrapper').remove();
+  $('#juegoId').remove();
+  $('#res').remove();
+  $('#resultados').remove();
+  $('#canvas').append('<h3 id="res">Resultados</h3><table id="tabla" class="display" width="100%"></table>');
+
+  var array=[];
+  for(var i=0;i<datos.length;i++)
+  {
+    array.push([datos[i].nombre,datos[i].email,datos[i].nivel,datos[i].tiempo]);
+  }
+
+  $('#tabla').DataTable( {
+        data: array,
+        columns: [
+            { title: "Nombre" },
+            { title: "Email" },
+            { title: "Nivel" },
+            { title: "Tiempo" }
+        ]
+    } );
+
 }
 
 function noHayNiveles(){
@@ -173,6 +207,8 @@ function eliminarCabeceras(){
   $('#reset').remove();
   $('#siguienteBtn').remove();
   $('#juegoId').remove();
+  $('#info').remove();
+  $('#nombre').remove();
   eliminarGame();
 }
 
@@ -235,7 +271,8 @@ function loginUsuario(nombre,clave){
     data:JSON.stringify({email:nombre,password:clave}),
     success:function(data){
       if (data.email==""){
-        mostrarRegistro();
+        mostrarLogin();
+        $('#control').append('<p id="cabecera"><h5 id="info">Ups, el usuario o la contraseña son incorrectos.</h5></p>');
       }
       else{
         $.cookie('nombre',data.nombre);
@@ -259,6 +296,7 @@ function registroUsuario(email, password){
 		success:function(data){
 			if(data.email==undefined){
 				mostrarRegistro();
+				$('#control').append('<p id="cabecera"><h5 id="info">El email introducido ya está registrado.</h5></p>');
 			}else{
 				$.cookie('nombre',data.nombre);
 		        $.cookie('email',data.email);
@@ -281,7 +319,9 @@ function actualizarUsuario(email,nombre,newpass){
     data:JSON.stringify({uid:$.cookie("uid"),email:email,nombre:nombre,newpass:newpass,nivel:nivel}),
     success:function(data){
       if (data.email==undefined){
-        mostrarRegistro();
+        //mostrarRegistro();
+        mostrarActualizarEliminar();
+        $('#control').append('<p id="cabecera"><h5 id="info">No se ha podido realizar la actualización.</h5></p>');
       }
       else{
         $.cookie('nombre',data.nombre);
@@ -358,6 +398,8 @@ function obtenerResultados(){
     });
   } 
 }
+
+
 
 
 

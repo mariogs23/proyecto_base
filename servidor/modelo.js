@@ -39,6 +39,13 @@ function Resultado(nombre,nivel,tiempo){
 	this.tiempo=tiempo;
 }
 
+function Resultado(nombre, email, nivel,tiempo){
+	this.nombre=nombre;
+	this.email=email;
+	this.nivel=nivel;
+	this.tiempo=tiempo;
+}
+
 module.exports.Juego=Juego;
 module.exports.Usuario=Usuario;
 module.exports.Resultado=Resultado;
