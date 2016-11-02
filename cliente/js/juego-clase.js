@@ -95,7 +95,7 @@ function create() {
 
         //  Player physics properties. Give the little guy a slight bounce.
         player.body.bounce.y = 0.2;
-        player.body.gravity.y = 400;
+        player.body.gravity.y = 500;
         player.body.collideWorldBounds = true;
 
         //  Our two animations, walking left and right.
@@ -112,10 +112,10 @@ function create() {
         for (var i = 0; i < 12; i++)
         {
             //  Create a star inside of the 'stars' group
-            var meteorito = meteoritos.create(i * 70, 0, 'meteorito');
-
+            //var meteorito = meteoritos.create(i * 70, 0, 'meteorito');
+            lanzarMeteorito();
             //  Let gravity do its thing
-            meteorito.body.gravity.y = 50;
+            //meteorito.body.gravity.y = 50;
 
             //  This just gives each Meteorito a slightly random bounce value
             //star.body.bounce.y = 0.7 + Math.random() * 0.2;
@@ -123,9 +123,9 @@ function create() {
         }
 
         //  The score
-        scoreText = game.add.text(16, 22, 'Vidas: 5', { fontSize: '32px', fill: '#000' });
+        scoreText = game.add.text(16, game.world.height - 50, 'Vidas: 5', { fontSize: '32px', fill: '#FFF' });
 
-        tiempoText=game.add.text(game.world.width-170,22,'Tiempo:0',{ fontSize: '32px', fill: '#000' });
+        tiempoText=game.add.text(game.world.width-180, game.world.height - 50,'Tiempo:0',{ fontSize: '32px', fill: '#FFF' });
         tiempo=0;
         timer=game.time.events.loop(Phaser.Timer.SECOND,updateTiempo,this);
 

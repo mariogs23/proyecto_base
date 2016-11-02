@@ -10,6 +10,7 @@
     "mongodb": "^2.1.18",
     "underscore": "^1.7.0",
     "ntwitter": "^0.5.0"
+    "body-parser":"^1.15.2"
   },
   "devDependencies": {},
   "scripts": {
