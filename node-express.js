@@ -1,9 +1,7 @@
 
 var fs=require("fs");
-//var config=JSON.parse(fs.readFileSync("config.json"));
-//var host=config.host;
-//var port=config.port;
-//var url="http://127.0.0.1:1338/";
+
+var url="http://127.0.0.1:1338/";
 //var url="https://pasaniveles.herokuapp.com/";
 
 var exp=require("express");
@@ -13,61 +11,42 @@ var app=exp();
 var modelo=require('./servidor/modelo.js');
 var ObjectID=require("mongodb").ObjectID;
 
-//var nodemailer = require('nodemailer');
-//var sgTransport = require('nodemailer-sendgrid-transport');
-//var client = nodemailer.createTransport(sgTransport(options));
-
 var cf=require("./servidor/cifrado.js");
 
-//var juego= new modelo.Juego();
-//var usuariosCol;
 var persistencia=require("./servidor/persistencia.js");
 
 var moduloEmail=require("./servidor/email.js");
 var fm=new modelo.JuegoFM("./servidor/coordenadas.json");
 var juego= fm.makeJuego(fm.juego, fm.array);
 
-//console.log(juego.niveles);
 
 var usuariosCol;
 var resultadosCol;
 var limboCol;
-/*
-var options = {
-  auth: {
-    api_user: 'mariogs',
-    api_key: 'patata123'
-  }
-}*/
 
 
-
-
+//////////////////////////////////////////////////
+///////////////////MÉTODOS APP////////////////////
+//////////////////////////////////////////////////
 app.set('port', (process.env.PORT || 1338));
 
-//app.use(app.router);
 app.use(exp.static(__dirname +"/cliente"));
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
 
-
-
 app.get("/",function(request,response){
 	var contenido=fs.readFileSync("./cliente/index-nav.html");
 	response.setHeader("Content-type","text/html");
 	response.send(contenido);
-	//insertar({email:"la",password:"la", nivel:"0"});
 });
 
 app.get('/crearUsuario/:nombre',function(request,response){
-	//crear el usuario con el nombre
 	var usuario= new modelo.Usuario(request.params.nombre);
 	juego.agregarUsuario(usuario);
 	var id=usuario.id;
 	usuario=juego.obtenerUsuario(id);
-	//console.log(usuario);
 	response.send({'nombre':usuario.nombre,'nivel':usuario.nivel,'id':usuario.id});
 });
 
@@ -75,7 +54,6 @@ app.get('/comprobarUsuario/:id',function(request,response){
 	var id=request.params.id;
 	var usuario=juego.obtenerUsuario(id);
 	var json={'nivel':-1};
-	//console.log("comprobar usuario: "+usuario);
 	if (usuario!=undefined){		
 		json={'nivel':usuario.nivel};
 	}
@@ -86,16 +64,13 @@ app.get('/nivelCompletado/:id/:tiempo',function(request,response){
 	var uid=request.params.id;
 	var tiempo=request.params.tiempo;
 	var usuario=juego.obtenerUsuario(uid);
-
-	//console.log(tiempo);
 	
 	if(usuario!=undefined){
-		agregarResultado(new modelo.Resultado(usuario.nombre,usuario.email, usuario.nivel,tiempo, (new Date().valueOf())));
+		
+		persistencia.agregarResultado(new modelo.Resultado(usuario.nombre,usuario.email, usuario.nivel,tiempo, (new Date().valueOf())),resultadosCol, usuario);
 		usuario.nivel=usuario.nivel+1;
-		//console.log(juego.resultados);
 		
 		usuariosCol.update({_id:ObjectID(uid)},usuario,function(err,result){
-		 	//console.log(result);
 		   if (result.result.nModified==0){
 		     console.log("No se pudo actualizar");
 		     response.send({'nivel':-1});
@@ -108,7 +83,6 @@ app.get('/nivelCompletado/:id/:tiempo',function(request,response){
 		         } 
 		      }
 		     console.log("Usuario modificado");
-		     //console.log(json);
 		     response.send({'nivel':usr[0].nivel});
 		    });
 		  }
@@ -122,10 +96,7 @@ app.get('/obtenerResultados/:id',function(request,response){
 	var id=request.params.uid;
 	var usuario=juego.obtenerUsuario(id);
 	var json={'resultados':[]};
-	/*if (usuario){
-		json=juego.resultados;
-		
-	}*/
+
 	resultadosCol.find().toArray(function(error,result){
 		      if (!error){
 		         if (result.length!=0){
@@ -133,7 +104,6 @@ app.get('/obtenerResultados/:id',function(request,response){
 		         } 
 		      }
 		     console.log("Usuario modificado");
-		     //console.log(json);
 		     response.send(json);
 	});
 
@@ -160,11 +130,9 @@ app.get("/pedirNivel/:uid",function(request,response){
  var json={'nivel':-1};
 
   if (usuario && usuario.nivel<juego.niveles.length){
-  	//console.log(usuario);
     response.send(juego.niveles[usuario.nivel]);
   }
   else{
-  	//console.log(json);;
    	response.send(json);
   }
   
@@ -172,167 +140,50 @@ app.get("/pedirNivel/:uid",function(request,response){
 
 app.get('/volverAJugar/:uid',function(request,response){
 	var uid=request.params.uid;
-	//console.log(uid);
  	var usuario=juego.obtenerUsuario(uid);
- 	//console.log(usuario);
 	usuario.nivel=0;
 	var json={'email':undefined};
 
-	usuariosCol.update({_id:ObjectID(uid)},usuario,function(err,result){
-	   //console.log(result);
-	   if (result.result.nModified==0){
-		    console.log("No se pudo actualizar");
-		    response.send(json);
-	   }
-	   else{ 
-		     usuariosCol.find({_id:ObjectID(uid)}).toArray(function(error,usr){
-		      if (!error){
-		         if (usr.length!=0){
-		           json=usr[0];
-		         } 
-		      }
-		     console.log("Usuario modificado");
-		     //console.log(json);
-		     response.send(json);
-	    });
-	  }
-	});
+	console.log(usuario);
+		usuariosCol.update({_id:ObjectID(usuario._id)},usuario,function(err,result){
+		   if (result.nModified==0){
+			    console.log("No se pudo actualizar");
+			    response.send(json);
+		   }
+		   else{ 
+			     usuariosCol.find({_id:ObjectID(usuario._id)}).toArray(function(error,usr){
+			      if (!error){
+			         if (usr.length!=0){
+			           json=usr[0];
+			         } 
+			      }
+			     console.log("Usuario modificado");
+			     console.log(json);
+			     response.send(json);
+		    });
+		  }
+		});
+
 });
 
-
-app.post("/login",function(request,response){
-	 var email=request.body.email;
-	 var pass=request.body.password;
-	 var passCifrada= cf.encrypt(pass);
-	 usuariosCol.find({email:email,password:passCifrada}).toArray(function(error,usr){
-		 //console.log(usr);
-		 if (usr.length==0){
-			 //if(error){
-			 //response.redirect("/signup");
-			 response.send({'email':''});
-		 }
-		 else{
-			 //response.send({'usuario':usr});
-			 juego.agregarUsuario(usr[0]);
-			 response.send(usr[0]);
-		 }
-	 });
-});
-
-
-
-/*app.post('/login',function(request,response){
-	var email=request.body.email;
-	var password=request.body.password;
-	usuariosCol.find({email:email,password:password}).toArray(function(error,usr){
-		if(usr.length==0){
-			response.send({'email':''})
-		}else{
-			juego.agregarUsuario(usr[0]);
-			response.send(usr[0]);
-		}
-	})
-});*/
-
-app.post("/signup",function(request,response){
-	 //console.log(request.body.email);
-	 //console.log(request.body.password);
-	 var email=request.body.email;
-	 var usu;
-	 limboCol.find({email:email}).toArray(function(error,usr){
-		 //console.log(usr);
-		 if (usr.length==0){
-			 //if (usr==undefined){
-			 usu=new modelo.Usuario(email);
-			 usu.email=email;
-			 usu.password=cf.encrypt(request.body.password);
-			 persistencia.insertarUsuario(limboCol,usu,function(usu){
-			 	moduloEmail.enviarEmail(usu.email,usu.key);
-			 	response.send({email:email});
-			 });
-		 }
-		 else{
-		 	response.send({email:undefined})
-		 }
-	 });
-});
-
-function insertarUsuario(usu,response){
- //var usuariosCol = db.collection("usuarios");
-	 //console.log(usu);
-	 usuariosCol.insert(usu,function(err){
-		 if(err){
-		 	console.log("error");
-		 }
-		 else{
-			 console.log("Nuevo usuario creado");
-			 juego.agregarUsuario(usu);
-			 //response.send("<h1>Conquista Nieveles: Cuenta Confirmada</h1>");
-			 response.redirect("/");
-		 }
-	 //db.close();
-	 });
-	 
-};
-
-
-
-/*function insertarUsuarioLimbo(usu,response){
- //var usuariosCol = db.collection("usuarios");
-	 console.log(usu);
-	 limboCol.insert(usu,function(err){
-		 if(err){
-		 	console.log("error");
-		 }
-		 else{
-			 console.log("Nuevo usuario creado");
-			 response.send({email:'ok'})
-			 moduloEmail.enviarEmail(usu.email,usu.key);
-		 }
-	 //db.close();
-	 });
-
-};*/
-
-/*
-function enviarEmail(direccion, key){
-	var email = {
-		  from: 'pasaniveles@uclm.es',
-		  to: direccion,
-		  subject: 'Cofirmar cuenta',
-		  text: 'Cofirmar cuenta',
-		  html: '<a href= "'+url+'confirmarUsuario/'+direccion+'/'+key+'">Pasa Niveles</a>'
-	};
-
-	 client.sendMail(email, function(err, info){
-	    if (err ){
-	      console.log(error);
-	    }
-	    else {
-	      console.log('Message sent: ' + info.response);
-	    }
-	});
-
-}
-*/
 app.get("/confirmarUsuario/:email/:key",function(request,response){
 	 var key=request.params.key;
 	 var email= request.params.email;
 	 var usuario;
 
 	 limboCol.find({email:email, key:key}).toArray(function(error,usr){
-		 //console.log(usr);
 		 if (usr.length==0){
-			 //if (usr==undefined){
 			 console.log("El usuario no existe");
 			 response.send("<h1>La cuenta ya está activada<h1>");
 		 }
 		 else{
 		 	
-			insertarUsuario(usr[0],response);
-			//console.log(usr[0]);
+			//insertarUsuario(usr[0],response);
+			persistencia.insertarUsuario(usuariosCol,usr[0],function(usu){
+			 	juego.agregarUsuario(usu);
+			 	response.redirect("/");
+			});
 			persistencia.modificarColeccion(limboCol, usr[0]);
-			//response.send("<h1>Cuenta activada<h1>");
 		 }		 
 	 });
 });
@@ -342,10 +193,9 @@ app.get("/enviarClave/:email",function(request,response){
 	 var email= request.params.email;
 
 	 usuariosCol.find({email:email}).toArray(function(error,usr){
-		 //console.log(usr);
 		 if (usr.length!=0){
-			 //if (usr==undefined){
-			 moduloEmail.enviarClave(usr[0].email,cf.decrypt(usr[0].password));
+			 var cadena= '<body><div autoid="_rp_D" class="_rp_i5">  <div class="itemPartBody _rp_k5 ms-font-weight-regular ms-font-color-neutralDark" style="display: none;"></div>  <div autoid="_rp_E" class="_rp_j5" style="display: none;"></div>  <div><div autoid="_rp_F" class="_rp_j5 rpHighlightAllClass rpHighlightBodyClass allowTextSelection" role="region" aria-label="Cuerpo del mensaje">   <div style="display: none;"></div> <div style="display: none;"></div>  <div>  <div class="_rp_k5 ms-font-weight-regular ms-font-color-neutralDark" role="presentation" tabindex="-1"><div class="rps_7970"><div><div><table width="100%" border="0" cellspacing="0" cellpadding="0" align="center"><tbody><tr><td align="center" style="color:#696969; font:10px Arial">&nbsp;</td></tr></tbody></table><table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#2d69b8"><tbody><tr><td style="padding:0 0 40px"><table width="684" border="0" cellspacing="0" cellpadding="0" bgcolor="#2d69b8" align="center"><tbody><tr<td rowspan="2" width="405" height="137"><a href="https://pasaniveles.herokuapp.com/" target="_blank"><h1 width="405" height="137" border="0" style="color:#FFF; font:bold 25px Arial; display:block"></a> </td><td colspan="7" height="102">&nbsp;</td></tr><tr><td background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/mundijuegos/background.png" colspan="8"><table width="684" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td width="42">&nbsp;</td><td width="600" bgcolor="#f5f5f5" style="padding-top:19px"><div style="color:#1a52b8; font:bold 24px ,Arial; line-height:30px; padding-left:50px; padding-right:50px; padding-bottom:19px"><span class="highlight" id="0.26437121236652006" name="searchHitInReadingPane">Pasa Niveles</span></div><table width="600" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF"><tbody><tr><td background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/balloon_up.png" height="16" colspan="3"></td></tr><tr><td background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/balloon_bg.png" style="padding-left:65px; padding-right:65px; padding-top:15px; padding-bottom:15px; color:#4f4f4f; font:12px Arial"><table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td><b style="font-size:14px">Hola '+usr[0].nombre+'</b><br><br>Has solucitado el recordatorio de tu contraseña, la cual es:<br><br> <b style="font-size:14px">'+cf.decrypt(usr[0].password)+'</b> <br><br>Para empezar a jugar pulsa el siguiente botón: <br><br><table background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/button-green.png" width="233" align="center" height="72" border="0" cellspacing="0" cellpadding="0" bgcolor="#7bc71e"><tbody><tr><td align="center" valign="middle"><a href= "'+url+'" target="_blank" style="color:#FFF; font:bold 18px Tahoma,Arial; line-height:60px; text-decoration:none; display:block; width:233px; line-height:24px">Jugar ahora</a> </td></tr></tbody></table><br><br>Esperamos que disfrutes del juego.<br>El equipo de <b><span class="highlight" id="0.5966038671217082" name="searchHitInReadingPane">Pasa Niveles</span></b></td><td width="136" align="right" valign="top"><img src="http://d4tkw3ysp08j4.cloudfront.net/newavatarv3/maxi/03841302c08000500000000000000003e0000000000ca8410800000044a48a88888890.jpg?updated=1483471434" width="136" height="153" alt="Tu avatar" style="font-size:10px"> </td></tr></tbody></table></td></tr><tr><td background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/balloon_down.png" height="21" colspan="3"></td></tr></tbody></table><br><br></td><td width="42">&nbsp;</td></tr></tbody></table></td></tr><tr><td background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/mundijuegos/footer.png" colspan="8" valign="middle" height="124" style="padding-left:60px; padding-right:60px; text-align:left; color:#d1d1d1; font:11px Arial"><div style="padding-bottom:12px">No respondas ni reenvies este email, puede contener información confidencial sobre tu cuenta.<br>Servicio ofrecido por <a href="https://pasaniveles.herokuapp.com/" target="_blank" style="text-decoration:underline; color:#dddddd"><span class="highlight" id="0.36861047654943846" name="searchHitInReadingPane">Pasa Niveles</span>.com</a> </div></td></tr></tbody></table></td></tr></tbody></table><table width="100%" border="0" cellspacing="0" cellpadding="0" align="center"></table> <div style="display: none;"></div> </div> </div></div> <div style="display: none;"></div> </div></body>';	
+			 moduloEmail.enviarEmail(usr[0].email,cadena);
 			 response.send({email:email})
 		 }
 		 else{
@@ -359,50 +209,57 @@ app.get("/obtenerKeyUsuario/:email/:adminKey",function(request,response){
 	 var adminKey= request.params.adminKey;
 	 var usuario;
 
-	 //console.log('Administrador: ' + adminKey);
-
 	 if(adminKey=="patata"){
 
 		 limboCol.find({email:email}).toArray(function(error,usr){
-			 //console.log(usr);
 			 if (usr.length==0){
-				 //if (usr==undefined){
 				 console.log("El usuario no existe");
 				 response.send({key:""});
-				 //response.send("<h1>La cuenta ya está activada<h1>");
 			 }
 			 else{
 			 	response.send({key:usr[0].key});
-				//insertarUsuario(usr[0],response);
-				//modificarEnLimbo(usr[0]._id);
 			 }		 
 		 });
 	}
 });
 
-/*
-function modificarEnLimbo(uid){
-	
-	limboCol.findAndModify({_id:ObjectID(uid)},{},{$set:{key:""}},{},function(err,usr){
-		 //console.log(usr);
-		 if (err){
-			 console.log("No se pudo actualizar");
+app.post("/login",function(request,response){
+	 var email=request.body.email;
+	 var pass=request.body.password;
+	 var passCifrada= cf.encrypt(pass);
+	 usuariosCol.find({email:email,password:passCifrada}).toArray(function(error,usr){
+		 if (usr.length==0){
+			 response.send({'email':''});
 		 }
 		 else{
-		 	console.log("Usuario del limbo acualizado");
+			 juego.agregarUsuario(usr[0]);
+			 response.send(usr[0]);
 		 }
-	});
-}*/
+	 });
+});
+
+app.post("/signup",function(request,response){
+	 var email=request.body.email;
+	 var usu;
+	 limboCol.find({email:email}).toArray(function(error,usr){
+		 if (usr.length==0){
+			 usu=new modelo.Usuario(email, cf.encrypt(request.body.password));
+			 persistencia.insertarUsuario(limboCol,usu,function(usu){
+			 	var cadena= '<body><div autoid="_rp_D" class="_rp_i5">  <div class="itemPartBody _rp_k5 ms-font-weight-regular ms-font-color-neutralDark" style="display: none;"></div>  <div autoid="_rp_E" class="_rp_j5" style="display: none;"></div>  <div><div autoid="_rp_F" class="_rp_j5 rpHighlightAllClass rpHighlightBodyClass allowTextSelection" role="region" aria-label="Cuerpo del mensaje">   <div style="display: none;"></div> <div style="display: none;"></div>  <div>  <div class="_rp_k5 ms-font-weight-regular ms-font-color-neutralDark" role="presentation" tabindex="-1"><div class="rps_7970"><div><div><table width="100%" border="0" cellspacing="0" cellpadding="0" align="center"><tbody><tr><td align="center" style="color:#696969; font:10px Arial">&nbsp;</td></tr></tbody></table><table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#2d69b8"><tbody><tr><td style="padding:0 0 40px"><table width="684" border="0" cellspacing="0" cellpadding="0" bgcolor="#2d69b8" align="center"><tbody><tr<td rowspan="2" width="405" height="137"><a href="https://pasaniveles.herokuapp.com/" target="_blank"><h1 width="405" height="137" border="0" style="color:#FFF; font:bold 25px Arial; display:block"></a> </td><td colspan="7" height="102">&nbsp;</td></tr><tr><td background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/mundijuegos/background.png" colspan="8"><table width="684" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td width="42">&nbsp;</td><td width="600" bgcolor="#f5f5f5" style="padding-top:19px"><div style="color:#1a52b8; font:bold 24px ,Arial; line-height:30px; padding-left:50px; padding-right:50px; padding-bottom:19px">Bienvenido a <span class="highlight" id="0.26437121236652006" name="searchHitInReadingPane">Pasa Niveles</span></div><table width="600" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF"><tbody><tr><td background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/balloon_up.png" height="16" colspan="3"></td></tr><tr><td background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/balloon_bg.png" style="padding-left:65px; padding-right:65px; padding-top:15px; padding-bottom:15px; color:#4f4f4f; font:12px Arial"><table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td><b style="font-size:14px">Hola '+usu.nombre+'</b><br><br>¡Felicidades! ¡Ya eres un jugador registrado! Para finalizar tu registro y empezar a jugar pulsa el siguiente botón:<br><br><table background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/button-green.png" width="233" align="center" height="72" border="0" cellspacing="0" cellpadding="0" bgcolor="#7bc71e"><tbody><tr><td align="center" valign="middle"><a href= "'+url+'confirmarUsuario/'+usu.email+'/'+usu.key+'" target="_blank" style="color:#FFF; font:bold 18px Tahoma,Arial; line-height:60px; text-decoration:none; display:block; width:233px; line-height:24px">Jugar ahora</a> </td></tr></tbody></table><br><br>Esperamos que disfrutes del juego.<br>El equipo de <b><span class="highlight" id="0.5966038671217082" name="searchHitInReadingPane">Pasa Niveles</span></b></td><td width="136" align="right" valign="top"><img src="http://d4tkw3ysp08j4.cloudfront.net/newavatarv3/maxi/03841302c08000500000000000000003e0000000000ca8410800000044a48a88888890.jpg?updated=1483471434" width="136" height="153" alt="Tu avatar" style="font-size:10px"> </td></tr></tbody></table></td></tr><tr><td background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/balloon_down.png" height="21" colspan="3"></td></tr></tbody></table><br><br></td><td width="42">&nbsp;</td></tr></tbody></table></td></tr><tr><td background="http://d3mapax0c3izpi.cloudfront.net/gfx/news/template2/mundijuegos/footer.png" colspan="8" valign="middle" height="124" style="padding-left:60px; padding-right:60px; text-align:left; color:#d1d1d1; font:11px Arial"><div style="padding-bottom:12px">No respondas ni reenvies este email, puede contener información confidencial sobre tu cuenta.<br>Servicio ofrecido por <a href="https://pasaniveles.herokuapp.com/" target="_blank" style="text-decoration:underline; color:#dddddd"><span class="highlight" id="0.36861047654943846" name="searchHitInReadingPane">Pasa Niveles</span>.com</a> </div></td></tr></tbody></table></td></tr></tbody></table><table width="100%" border="0" cellspacing="0" cellpadding="0" align="center"></table> <div style="display: none;"></div> </div> </div></div> <div style="display: none;"></div> </div></body>';
+			 	moduloEmail.enviarEmail(usu.email, cadena);
+			 	response.send({email:email});
+			 });
+		 }
+		 else{
+		 	response.send({email:undefined})
+		 }
+	 });
+});
 
 app.put("/actualizarUsuario",function(request,response){
- //var uid=request.params.uid;
- //var email=request.body.email;
+
 	 var uid=request.body.uid;
 
-	 //request.body.password= cf.encrypt(request.body.password);
-	 //var nombre=request.body.nombre;
-	 //var password=request.body.newpass;
-	 //var nivel=parseInt(request.body.nivel);
 	 var json={'email':undefined};
 	 var usu=juego.obtenerUsuario(uid);
 	 
@@ -410,7 +267,7 @@ app.put("/actualizarUsuario",function(request,response){
 	 	 console.log(request.body);
 		 var usuario=comprobarCambios(request.body,usu);
 		 usuariosCol.update({_id:ObjectID(uid)},usuario,function(err,result){
-		   //console.log(result);
+
 		   if (result.result.nModified==0){
 		     console.log("No se pudo actualizar");
 		     response.send(json);
@@ -433,6 +290,67 @@ app.put("/actualizarUsuario",function(request,response){
 		}
 });
 
+app.delete("/eliminarUsuario/:uid",function(request,response){
+ var uid=request.params.uid;
+ var json={'resultados':-1};
+ 
+ if(ObjectID.isValid(uid)){
+	 usuariosCol.remove({_id:ObjectID(uid)},function(err,result){
+
+	  if (result.result.n==0){
+	    console.log("No se pudo eliminar");
+	  }
+	  else{
+	   json={"resultados":1};
+	   console.log("Usuario eliminado");
+	  }
+	  
+	  limboCol.remove({_id:ObjectID(uid)},function(err,result){
+
+	  if (result.result.n==0){
+	    console.log("No se pudo eliminar");
+	  }
+	  else{
+	   json={"resultados":1};
+	   console.log("Usuario eliminado");
+	  }
+	  response.send(json);
+	  });
+
+	 });
+  }else{
+  	response.send(json);
+  }
+});
+
+/*
+function modificarEnLimbo(uid){
+	
+	limboCol.findAndModify({_id:ObjectID(uid)},{},{$set:{key:""}},{},function(err,usr){
+		 //console.log(usr);
+		 if (err){
+			 console.log("No se pudo actualizar");
+		 }
+		 else{
+		 	console.log("Usuario del limbo acualizado");
+		 }
+	});
+}*/
+
+/*function insertarUsuario(usu,response){
+	 usuariosCol.insert(usu,function(err){
+		 if(err){
+		 	console.log("error");
+		 }
+		 else{
+			 console.log("Nuevo usuario creado");
+			 juego.agregarUsuario(usu);
+			 response.redirect("/");
+		 }
+	 });
+	 
+};*/
+
 function comprobarCambios(body,usu){
  if (body.email!=usu.email && body.email!=""){
    usu.email=body.email;
@@ -448,48 +366,7 @@ function comprobarCambios(body,usu){
  }
  return usu;
 }
-
-
-
-app.delete("/eliminarUsuario/:uid",function(request,response){
- var uid=request.params.uid;
- var json={'resultados':-1};
- 
- if(ObjectID.isValid(uid)){
-	 usuariosCol.remove({_id:ObjectID(uid)},function(err,result){
-	  //console.log(result);
-	  if (result.result.n==0){
-	    console.log("No se pudo eliminar");
-	  }
-	  else{
-	   json={"resultados":1};
-	   console.log("Usuario eliminado");
-	  }
-	  
-	 
-	  
-	  limboCol.remove({_id:ObjectID(uid)},function(err,result){
-	  //console.log(result);
-	  if (result.result.n==0){
-	    console.log("No se pudo eliminar");
-	  }
-	  else{
-	   json={"resultados":1};
-	   console.log("Usuario eliminado");
-	  }
-	  response.send(json);
-	  });
-	  //response.send(json);
-	 });
-  }else{
-  	response.send(json);
-  }
-});
-
-
-
-
-
+/*
 function insertar(usu){
 	usuariosCol.insert(usu,function(err){
 		if(err){
@@ -503,9 +380,9 @@ function insertar(usu){
 		}
 	});
 
-}
+}*/
 
-function agregarResultado(res){
+/*function agregarResultado(res){
 	console.log(res);
 	resultadosCol.find({email:res.email, nivel:res.nivel}).toArray(function(error, usr){
 		if(usr.length==0){
@@ -527,17 +404,17 @@ function agregarResultado(res){
 		}
 	})
 
-}
+}*/
 
-
+//////////////////////////////////////////////////
+////EJECUCIÓN DE INICIO Y CONEXIÓN CON LA BBDD////
+//////////////////////////////////////////////////
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
 
-//var db= new mongo.Db("usuarioscn",new mongo.Server("127.0.0.1","27017",{}));
 
 mongo.connect("mongodb://mario:mario@ds061354.mlab.com:61354/usuarioscn", function(err, db) {
-//mongo.connect("mongodb://127.0.0.1:27017/usuarioscn", function(err, db) {
 	
 	if (err){
 		console.log("No pudo conectar a la base de datos")
@@ -545,7 +422,7 @@ mongo.connect("mongodb://mario:mario@ds061354.mlab.com:61354/usuarioscn", functi
 	else{
 		console.log("conectado a Mongo: usuarioscn");
 		db.collection("usuarios",function(err,col){
-			console.log("tenemos la colección");
+			console.log("Tenemos la colección: Usuarios");
 			usuariosCol=col;
 		});
 
@@ -554,8 +431,7 @@ mongo.connect("mongodb://mario:mario@ds061354.mlab.com:61354/usuarioscn", functi
 			 	console.log("No se puede obtener la colección de resultados");
 			 }
 			 else{
-				 console.log("Tenemos la colección");
-				 //juego.agregarUsuario(usu);
+				 console.log("Tenemos la colección: Resultados");
 				 resultadosCol=col;
 			 }
 	 	});
@@ -565,8 +441,7 @@ mongo.connect("mongodb://mario:mario@ds061354.mlab.com:61354/usuarioscn", functi
 			 	console.log("No se puede obtener la colección de limbo");
 			 }
 			 else{
-				 console.log("Tenemos la colección limbo");
-				 //juego.agregarUsuario(usu);
+				 console.log("Tenemos la colección: Limbo");
 				 limboCol=col;
 			 }
 	 	});

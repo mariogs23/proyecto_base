@@ -33,16 +33,16 @@ function Nivel(num, coord, gravedad){
 }
 
 
-function Usuario(nombre){
+function Usuario(email, pass){
 	this.key=(new Date().valueOf()).toString();
-	this.nombre=nombre;
+	this.nombre=email.match(/^([^@]*)@/)[1];
 	this.nivel=0;
-	this.password=undefined;
-	this.email=nombre;
+	this.password=pass;
+	this.email=email;
 }
 
 function Resultado(nombre,nivel,tiempo){
-	this.nombre=nombre;
+	this.nombre=email;
 	this.nivel=nivel;
 	this.tiempo=tiempo;
 }
@@ -62,8 +62,8 @@ function JuegoFM(archivo){
 	this.makeJuego=function(juego, array){
 		var indi=0;
 		array.forEach(function(ele){
-			console.log(ele.gravedad);
-			console.log(ele.coord);
+			//console.log(ele.gravedad);
+			//console.log(ele.coord);
 			var nivel= new Nivel(indi, ele.coord, ele.gravedad);
 			juego.agregarNivel(nivel);
 			indi++;

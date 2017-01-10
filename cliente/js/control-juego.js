@@ -1,6 +1,6 @@
 
-//var url="http://127.0.0.1:1338/";
-var url="https://pasaniveles.herokuapp.com/";
+var url="http://127.0.0.1:1338/";
+//var url="https://pasaniveles.herokuapp.com/";
 
 var nombre;
 var nivel=-1;
@@ -34,8 +34,8 @@ function mostrarLogin(){
   limpiar();
   //mostrarIntro();
   var cadena='<div class="container" id="login"><div class="mainbox col-md-6 col-md-offset-3">';
-  cadena=cadena+'<h2 id="cabeceraP">Inicio de sesión</h2><div id="ig1" class="input-group" style="margin-bottom:25px">';
-  cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>';
+  cadena=cadena+'<h1 id="cabeceraP" style="color:#E6E6E6;">Inicio de sesión</h1><div id="ig1" class="input-group" style="margin-bottom:25px">';
+  cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>';
   cadena=cadena+'<input id="email" type="text" class="form-control" name="email" placeholder="Escribe tu email"></div>';
   cadena=cadena+'<div id="ig2" class="input-group" style="margin-bottom:25px">';
   cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>';
@@ -43,7 +43,7 @@ function mostrarLogin(){
 
   //$('#control').append('<p id="login"><h2 id="cabeceraP">Inicio de sesión</h2><input type="email" id="email" class="form-control" placeholder="introduce tu email" required><input type="password" id="clave" class="form-control" placeholder="introduce tu clave" required></p>');
   $('#home').append(cadena);
-  $('#home').append('<p id="nombreBtn"><button type="button" id="nombreBtn" class="btn btn-primary btn-md">Iniciar partida</button></p><a href="#" id="refRecordar">Recordar clave</a>');//' <a href="#" id="refRegistro" onclick="mostrarRegistro();">Registrar usuario</a>');
+  $('#home').append('<p id="nombreBtn"><button type="button" id="nombreBtn" class="btn btn-primary btn-md" >Iniciar partida</button></p><a href="#" id="refRecordar" style="color:#E6E6E6;">Recordar clave</a>');//' <a href="#" id="refRegistro" onclick="mostrarRegistro();">Registrar usuario</a>');
   $('#home').append('<h4 id="info"><span class="label label-warning"></span></h4>');
   $('#email').blur(function() {
     var testEmail = /^[A-Z0-9._%+-]+@([A-Z0-9-]+\.)+[A-Z]{2,4}$/i;
@@ -92,11 +92,11 @@ function mostrarRegistro(){
 
 //  $('#home').append('<p id="cabecera"><h2 id="cabeceraP">Registro de usuarios</h2><input type="email" id="email" class="form-control" placeholder="introduce tu email"><input type="password" id="clave" class="form-control" placeholder="introduce tu clave"></p>');
 var cadena='<div class="container" id="login"><div class="mainbox col-md-6 col-md-offset-3">';
-  cadena=cadena+'<h2 id="cabeceraP">Nuevo usuario</h2><div id="ig1" class="input-group" style="margin-bottom:25px">';
-  cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>';
+  cadena=cadena+'<h1 id="cabeceraP" style="color:#E6E6E6;">Nuevo usuario</h1><div id="ig1" class="input-group" style="margin-bottom:25px">';
+  cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>';
   cadena=cadena+'<input id="email" type="text" class="form-control" name="email" placeholder="Escribe tu email"></div>';
   cadena=cadena+'<div id="ig12" class="input-group" style="margin-bottom:25px">';
-  cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>';
+  cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>';
   cadena=cadena+'<input id="email2" type="text" class="form-control" name="email" placeholder="Repite el email"></div>';
   cadena=cadena+'<div id="ig2" class="input-group" style="margin-bottom:25px">';
   cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>';
@@ -183,7 +183,57 @@ function mostrarActualizarEliminar(){
   }
   if(uid!=undefined)
   {
-    $('#control').append('<p id="cabecera"><h2 id="cabeceraP">Actualizar datos usuario</h2><input type="text" id="email" class="form-control" placeholder="Email: '+email+'"><input type="text" id="nombre" class="form-control" placeholder="Nombre: '+nombre+'"><input type="password" id="newpass" class="form-control" placeholder="introduce tu nueva clave"></p>');
+    var cadena='<div class="container" id="update"><div class="mainbox col-md-6 col-md-offset-3">';
+    cadena=cadena+'<h1 id="cabeceraP" style="color:#E6E6E6;">Actualizar datos usuario</h1><div id="ig1" class="input-group" style="margin-bottom:25px">';
+    cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>';
+    cadena=cadena+'<input id="email" type="text" class="form-control" name="email" value="'+email+'"></div>';
+    cadena=cadena+'<div id="ig2" class="input-group" style="margin-bottom:25px">';
+    cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>';
+    cadena=cadena+'<input id="nombre" type="text" class="form-control" name="nombre" value="'+nombre+'"></div>';
+    cadena=cadena+'<div id="ig2" class="input-group" style="margin-bottom:25px">';
+    cadena=cadena+'<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>';
+    cadena=cadena+'<input id="clave" type="password" class="form-control" name="password" placeholder="Escribe tu clave"></div></div></div>';
+
+    $('#home').append(cadena);
+    $('#home').append('<p id="nombreBtn"><button type="button" id="nombreBtn" class="btn btn-primary btn-md" >Actualizar Usuario</button></p><a href="#" id="eliminarBtn" style="color:#E6E6E6;" class="btn btn-danger btn-md">Eliminar Usuario</a>');//' <a href="#" id="refRegistro" onclick="mostrarRegistro();">Registrar usuario</a>');
+    $('#home').append('<h4 id="info"><span class="label label-warning"></span></h4>');
+
+
+    
+        $('#nombreBtn').on('click',function(){
+          var newEmail=$('#email').val();
+          var newNombre=$('#nombre').val();
+          var newpass=$('#clave').val();
+
+          $('#email').val(function() {
+            var testEmail = /^[A-Z0-9._%+-]+@([A-Z0-9-]+\.)+[A-Z]{2,4}$/i;
+            if (testEmail.test(this.value) ) 
+            {
+              $('#update').remove();
+              $('#nombreBtn').remove();   
+              actualizarUsuario(newEmail,newNombre,newpass);
+            }
+            else {
+              mostrarAvisoEmail("Debe ser una dirección de email");
+            }
+          });
+        });
+        $('#eliminarBtn').on('click',function(){
+          var nombre=$('#email').val();
+          //var clave=$('#clave').val();
+          $('#update').remove();
+          $('#nombreBtn').remove();   
+          eliminarUsuario(nombre);
+        });
+      
+  }
+  else{
+    mostrarLogin();
+  }
+
+
+    //SE PUEDE BORRAR
+    /*$('#control').append('<p id="cabecera"><h2 id="cabeceraP" style="color:#E6E6E6;">Actualizar datos usuario</h2><input type="text" id="email" class="form-control" placeholder="Email: '+email+'"><input type="text" id="nombre" class="form-control" placeholder="Nombre: '+nombre+'"><input type="password" id="newpass" class="form-control" placeholder="introduce tu nueva clave"></p>');
     $('#control').append('<button type="button" id="actualizarBtn" class="btn btn-primary btn-md">Actualizar usuario</button> <button type="button" id="eliminarBtn" class="btn btn-danger btn-md">Eliminar usuario</button>');
     $('#actualizarBtn').on('click',function(){
       var newEmail=$('#email').val();
@@ -202,7 +252,7 @@ function mostrarActualizarEliminar(){
   }
   else{
     mostrarLogin();
-  }
+  }*/
 }
 
 
@@ -212,6 +262,7 @@ function limpiar(){
   $('#ig12').remove();
   $('#ig2').remove();
   $('#login').remove();
+  $('#update').remove();
   $('#email').remove();
   $('#clave').remove();
   $('#nombreBtn').remove();
@@ -252,6 +303,7 @@ function mostrarInfoJugador(){
   {
     max=parseInt($.cookie("max"));
   }*/
+
   var percen=Math.floor((nivel/max)*100);
   limpiar();
   //borrarLogin();
@@ -263,7 +315,7 @@ function mostrarInfoJugador(){
   //$('#control').append('<div id="datos" class="panel-body"><h4><p>Email: '+email+'</p><p>Nombre: '+nombre+'</p><p>Nivel: '+nivel+' </p><p>'+percen+'% completado</p></h4></div></div>');
   //$('#control').append('<div id="prog" class="progress-bar" aria-valuemin="0" aria-valuemax="100" style="width:'+percen+'%">'+percen+'%</div></div></div>');
   siguienteNivel();
-  mostrarPanel();
+  //mostrarPanel();
   obtenerResultados();
 }
 
@@ -310,7 +362,10 @@ function mostrarResultados(datos){
   //var cadena="<div class='panel panel-default' id='res'><div class='panel-heading'><h4>Resultados</h4></div>";
   //cadena=cadena+"<div class='panel-body'>";
   
-  var cadena='<div id="tab" class="container-fluid"><h3>Resultados</h3><ul class="nav nav-tabs">';
+  //var cadena='<div id="cabecera" class="panel panel-default"><div class="panel-heading"><h3>Información del juego</h3></div>';
+  //cadena=cadena+'<div id="datos" class="panel-body"><p id="datos2"><strong>Email:</strong> '+email+'</p><p id="datos2"><strong>Nombre:</strong> '+nombre+'</p><p id="datos2"><strong>Nivel:</strong> '+nivel+' </p><p id="datos2"><strong>Progreso:</strong> '+percen+'% completado</p></div></div>';
+ 
+  var cadena='<div id="tab" class="panel panel-default"><div class="panel-heading"><h3 >Resultados</h3></div><ul class="nav nav-tabs">';
   cadena=cadena+'<li class="active"><a href="#resultados" data-toggle="tab">Todos</a></li>'
   cadena=cadena+'<li><a href="#mislogros" data-toggle="tab">Mis logros</a></li>'
   cadena=cadena+'<li><a href="#losmejores" data-toggle="tab">Los mejores</a></li></ul>'
@@ -324,10 +379,34 @@ function mostrarResultados(datos){
   cadena=cadena+"<div class='tab-pane' id='losmejores'>";
   cadena=cadena+obtenerLosMejores(datos);
   cadena=cadena+'</div>';
-  cadena=cadena+'</div><div class="text-center">';
-  cadena=cadena+'<ul class="pagination pagination-lg pager" id="miPager"></ul>'
-  cadena=cadena+'</div>'  ;
+  cadena=cadena+'</div><div class="paging-container" id="demo"> </div>';
+  cadena=cadena+'</div>';
+
   $('#canvas').append(cadena); 
+  mostrarControlPaginas(datos.length);
+}
+
+function mostrarControlPaginas(max){
+  Pagination('#demo',{
+          itemsCount: max,
+          pageSize: 10,
+          onPageSizeChange: function (ps) {
+            console.log('changed to ' + ps);
+          },
+          onPageChange: function (paging) {
+            //custom paging logic here
+            console.log(paging);
+            var start = paging.pageSize * (paging.currentPage - 1),
+              end = start + paging.pageSize,
+              $rows = $('#table').find('.data');
+
+            $rows.hide();
+
+            for (var i = start; i < end; i++) {
+              $rows.eq(i).show();
+            }
+          }
+        });
 }
 
 function eliminarResultados(){
@@ -620,13 +699,14 @@ function volverAJugar(){
     $.getJSON(url+"volverAJugar/"+uid,function(data){    
         //console.log(data);       
         //$.cookie("usr",JSON.stringify(data));
+        if(data.nivel!=undefined){
+          $.cookie('nombre',data.nombre);
+          $.cookie('email',data.email);
+          $.cookie('uid',data._id);
+          $.cookie('nivel',data.nivel);
 
-        $.cookie('nombre',data.nombre);
-        $.cookie('email',data.email);
-        $.cookie('uid',data._id);
-        $.cookie('nivel',data.nivel);
-
-        mostrarInfoJugador();
+          mostrarInfoJugador();
+        }
     });
   } 
 }

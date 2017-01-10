@@ -31,3 +31,26 @@ module.exports.modificarColeccion= function (coleccion, usr){
 		 }
 	});
 }
+
+module.exports.agregarResultado= function (res,coleccion, usr){
+	
+	coleccion.find({email:res.email, nivel:res.nivel}).toArray(function(error, usr){
+		if(usr.length==0){
+			coleccion.insert(res,function(err){
+				if(err){
+					console.log("error");
+				}else{
+					console.log("nuevo resultado creado")
+				}
+			});
+		}else{
+			coleccion.update({email:res.email, nivel:res.nivel},res,function(error, result){
+				if(result.result.nModified==0){
+					console.log("error");
+				}else{
+					console.log("nuevo resultado creado");	
+				}
+			});
+		}
+	});
+}
