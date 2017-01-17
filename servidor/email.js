@@ -1,5 +1,5 @@
-var url="http://127.0.0.1:1338/";
-//var url="https://pasaniveles.herokuapp.com/";
+//var url="http://127.0.0.1:1338/";
+var url="https://pasaniveles.herokuapp.com/";
 
 var nodemailer = require('nodemailer');
 var sgTransport = require('nodemailer-sendgrid-transport');
