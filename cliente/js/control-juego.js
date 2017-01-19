@@ -6,18 +6,10 @@ var nombre;
 var nivel=-1;
 var game;
 
-function comprobarUsuario(){
-  eliminarCabeceras();
-  if ($.cookie("uid")!=undefined)
-  {
-    srvComprobarUsuario();
-  }
-  else{
-    mostrarNavLogin();
-    mostrarLogin();
-  }
-}
 
+//////////////////////////////////////////////////
+/////////////////MÉTODOS MOSTRAR//////////////////
+//////////////////////////////////////////////////
 function mostrarIntro(){
   var cadena='<h3>Conquista Niveles</h3>';
   $('#intro').append(cadena);
@@ -135,16 +127,10 @@ function mostrarAvisoEmail(cadena){
   $("#info span").text(cadena);
 }
 
-function comprobarEmail(cad1,cad2){
-  if (cad1==cad2){
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
 function mostrarActualizarEliminar(){
+  eliminarGame();
+  $('#juegoId').remove();
+  $('#tab').remove();
   limpiar();
 
   if ($.cookie('uid')!=undefined){
@@ -198,37 +184,6 @@ function mostrarActualizarEliminar(){
   }
 }
 
-function limpiar(){
-  $('#ig1').remove();
-  $('#ig12').remove();
-  $('#ig2').remove();
-  $('#login').remove();
-  $('#update').remove();
-  $('#email').remove();
-  $('#clave').remove();
-  $('#nombreBtn').remove();
-  $('#datos').remove();
-  $('#cabeceraP').remove();
-  $('#cabecera').remove();
-  $('#prog').remove();
-  $('#cabecera').remove();
-  $('#enh').remove();
-  $('#siguienteBtn').remove();
-  $('#actualizarBtn').remove();
-  $('#eliminarBtn').remove();
-  $('#refRegistro').remove();
-  $('#nombre').remove();
-  $('#newpass').remove();
-  $('#tabla').remove();
-  $('#tabla_wrapper').remove();
-  $('#info').remove();
-  $('#panel').remove();
-  $('#reenvio').remove();
-  $('#refRecordar').remove();
-  $('#datos2').remove();
-  $('#tab').remove();
-}
-
 function mostrarInfoJugador(){
   var email= $.cookie("email");
   var id= $.cookie("uid");
@@ -261,21 +216,6 @@ function mostrarAviso(aviso){
    $('#control').append('<div id="cabecera"><h5>'+aviso+'</h5></div>')
 }
 
-function siguienteNivel(){
-  $('#control').append('<button type="button" id="siguienteBtn" class="btn btn-primary btn-md">Siguiente nivel</button>')
-  $('#siguienteBtn').on('click',function(){
-    $('#siguienteBtn').remove();
-    $('#enh').remove();
-    $('#res').remove();
-    $('#resultados').remove();
-    $('#tab').remove();
-    if ($('#juegoId').length==0){
-      $('#canvas').append('<div id="juegoId"></div>');
-    }
-    pedirNivel();
-  });
-}
-
 function mostrarResultados(datos){
   eliminarGame();
   $('#juegoId').remove();
@@ -302,11 +242,6 @@ function mostrarResultados(datos){
   mostrarControlPaginas(datos.length);
 }
 
-function eliminarResultados(){
-  $('#res').remove();
-  $('#resultados').remove();
-}
-
 function mostrarControlPaginas(max){
   Pagination('#demo',{
           itemsCount: max,
@@ -327,6 +262,119 @@ function mostrarControlPaginas(max){
             }
           }
         });
+}
+
+//////////////////////////////////////////////////
+/////////////////MÉTODOS LIMPIEZA/////////////////
+//////////////////////////////////////////////////
+function limpiar(){
+  $('#ig1').remove();
+  $('#ig12').remove();
+  $('#ig2').remove();
+  $('#login').remove();
+  $('#update').remove();
+  $('#email').remove();
+  $('#clave').remove();
+  $('#nombreBtn').remove();
+  $('#datos').remove();
+  $('#cabeceraP').remove();
+  $('#cabecera').remove();
+  $('#prog').remove();
+  $('#cabecera').remove();
+  $('#enh').remove();
+  $('#siguienteBtn').remove();
+  $('#actualizarBtn').remove();
+  $('#eliminarBtn').remove();
+  $('#refRegistro').remove();
+  $('#nombre').remove();
+  $('#newpass').remove();
+  $('#tabla').remove();
+  $('#tabla_wrapper').remove();
+  $('#info').remove();
+  $('#panel').remove();
+  $('#reenvio').remove();
+  $('#refRecordar').remove();
+  $('#datos2').remove();
+  $('#tab').remove();
+}
+
+function eliminarCabeceras(){
+  $('#resultados').remove();
+  $('#res').remove();
+  $('#cabecera').remove();
+  $('#nombre').remove();
+  $('#crear').remove();
+  $('#nivel').remove();
+  $('#help').remove();  
+  $('#reset').remove();
+  $('#siguienteBtn').remove();
+  $('#juegoId').remove();
+  eliminarGame();
+}
+
+function reset(){
+  eliminarCabeceras();
+  eliminarCookies();
+  eliminarGame();
+  mostrarNavLogin();
+  comprobarUsuario();
+}
+
+function eliminarGame(){
+  if (game && game.state!=null) {
+    game.destroy();
+  }
+}
+
+function eliminarCookies(){
+  $.removeCookie("uid");
+  $.removeCookie("email");
+  $.removeCookie("nivel");
+  $.removeCookie('nombre');
+}
+
+//////////////////////////////////////////////////
+///////////////MÉTODOS INTERACCIÓN////////////////
+//////////////////////////////////////////////////
+function comprobarEmail(cad1,cad2){
+  if (cad1==cad2){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+function comprobarUsuario(){
+  eliminarCabeceras();
+  if ($.cookie("uid")!=undefined)
+  {
+    srvComprobarUsuario();
+  }
+  else{
+    mostrarNavLogin();
+    mostrarLogin();
+  }
+}
+
+function siguienteNivel(){
+  $('#control').append('<button type="button" id="siguienteBtn" class="btn btn-primary btn-md">Siguiente nivel</button>')
+  $('#siguienteBtn').on('click',function(){
+    $('#siguienteBtn').remove();
+    $('#enh').remove();
+    $('#res').remove();
+    $('#resultados').remove();
+    $('#tab').remove();
+    if ($('#juegoId').length==0){
+      $('#canvas').append('<div id="juegoId"></div>');
+    }
+    pedirNivel();
+  });
+}
+
+function eliminarResultados(){
+  $('#res').remove();
+  $('#resultados').remove();
 }
 
 function obtenerTodos(datos){
@@ -388,50 +436,16 @@ function noHayNiveles(){
      });
 }
 
-function eliminarCabeceras(){
-  $('#resultados').remove();
-  $('#res').remove();
-  $('#cabecera').remove();
-  $('#nombre').remove();
-  $('#crear').remove();
-  $('#nivel').remove();
-  $('#help').remove();  
-  $('#reset').remove();
-  $('#siguienteBtn').remove();
-  $('#juegoId').remove();
-  eliminarGame();
-}
-
-function reset(){
-  eliminarCabeceras();
-  eliminarCookies();
-  eliminarGame();
-  mostrarNavLogin();
-  comprobarUsuario();
-}
-
-function eliminarGame(){
-  if (game && game.state!=null) {
-    game.destroy();
-  }
-}
-
-function eliminarCookies(){
-  $.removeCookie("uid");
-  $.removeCookie("email");
-  $.removeCookie("nivel");
-  $.removeCookie('nombre');
-}
-
 function nivelCompletado(tiempo){
   var id=$.cookie("uid");
   console.log(tiempo);
   eliminarGame();
-  //$('#juegoId').append("<h2 id='enh'>Enhorabuena!</h2>");
   comunicarNivelCompletado(tiempo);
 }
 
-//COMUNICACIONES
+//////////////////////////////////////////////////
+//////////////MÉTODOS COMUNICACIONES//////////////
+//////////////////////////////////////////////////
 function srvComprobarUsuario(){
   var id=$.cookie("uid");
 

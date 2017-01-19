@@ -7,8 +7,6 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <!--<link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">-->
-  <!--<script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>-->
   <script type="text/javascript" src="lib/jquery.cookie.js"></script>
   <script type="text/javascript" src="lib/pagination.js"></script>
   <script type="text/javascript" src="lib/phaser.min.js"></script>
@@ -19,9 +17,9 @@
   <script type="text/javascript" src="js/juego-clase.js"></script>
 
 
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/brand.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/brand.png">
 </head>
-<body style="background-image:url(assets/background.jpg)">  
+<body style="background-image:url(assets/images/background.jpg)">  
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -29,9 +27,7 @@
     </div>
     <ul class="nav navbar-nav">
       <li class="active"><a href="#" id="ini2" onclick="comprobarUsuario();">Inicio</a></li>
-      <li><a href="#" id="resul" onclick="obtenerResultados();">Resultados</a></li>
-      <!--<li><a href="#" onclick="mostrarActualizarEliminar();">Modificar perfil</a></li>
-      <li><a href="#" onclick="reset();">Salir</a></li>-->
+      <li><a href="#" id="resul" onclick="mostrarInfoJugador();">Resultados</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right" id="inicio">
     </ul>
@@ -55,10 +51,5 @@
   <script type="text/javascript">
       comprobarUsuario();
   </script>
-  <!--
-  <footer class="container-fluid bg-4 text-center">
-    <p>Dude sprite from: <a href="http://www.benmuellerdesigns.com/index.html">Ben Muller</a></p>
-  </footer>
-  -->
 </body>
 </html>

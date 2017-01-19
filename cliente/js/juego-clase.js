@@ -8,24 +8,30 @@ function crearNivel(data)
         game = new Phaser.Game(800, 600, Phaser.AUTO, 'juegoId', { preload: preload, create: create, update: update,render:render });
 
         function preload() {
-            game.load.image('sky', 'assets/sky'+nivel+'y.png');
-            game.load.image('ground', 'assets/platform.png');
-            game.load.image('ground2', 'assets/platform2.png');
-            game.load.image('meteorito', 'assets/meteorito.png');
-            game.load.image('heaven','assets/heaven.png');
-            game.load.image('firstaid','assets/firstaid.png');
+            game.load.image('sky', 'assets/images/sky'+nivel+'y.png');
+            game.load.image('ground', 'assets/images/platform.png');
+            game.load.image('ground2', 'assets/images/platform2.png');
+            game.load.image('meteorito', 'assets/images/meteorito.png');
+            game.load.image('heaven','assets/images/heaven.png');
+            game.load.image('firstaid','assets/images/firstaid.png');
 
-            game.load.spritesheet('dude5', 'assets/dude5.png', 32, 48);
-            game.load.spritesheet('dude4', 'assets/dude4.png', 32, 48);
-            game.load.spritesheet('dude3', 'assets/dude3.png', 32, 48);
-            game.load.spritesheet('dude2', 'assets/dude2.png', 32, 48);
-            game.load.spritesheet('dude1', 'assets/dude1.png', 32, 48);
-            
-            //game.load.spritesheet('vida', 'assets/vida.png', 41, 48);
-            game.load.spritesheet('explosion','assets/explosion.png',50,128);
+            game.load.spritesheet('dude5', 'assets/images/dude5.png', 32, 48);
+            game.load.spritesheet('dude4', 'assets/images/dude4.png', 32, 48);
+            game.load.spritesheet('dude3', 'assets/images/dude3.png', 32, 48);
+            game.load.spritesheet('dude2', 'assets/images/dude2.png', 32, 48);
+            game.load.spritesheet('dude1', 'assets/images/dude1.png', 32, 48);
+
+            game.load.spritesheet('buttonSound', 'assets/images/buttonSound.png', 32,32);
+            game.load.spritesheet('buttonSound2', 'assets/images/buttonSound2.png', 32,32);
+
+            game.load.spritesheet('explosion','assets/images/explosion.png',50,128);
+
+            game.load.audio('audio', 'assets/audios/audio.mp3');
+            game.load.audio('audioExplosion', 'assets/audios/explosion.mp3');
+            game.load.audio('audioVida', 'assets/audios/vida.mp3');
+            game.load.audio('audioOver', 'assets/audios/gameOver.mp3');
         }
 
-        //var game;
         var player;
         var platforms;
         var grupoFin;
@@ -36,7 +42,7 @@ function crearNivel(data)
         var vidas;
 
         var text="Vidas:";
-        var style={font:"30px Arial",fill:"#ffffff",align:"right"};
+        var style={font:"30px Arial",fill:"#000000",align:"right"};
         var board;
 
         var segundos=0;
@@ -48,7 +54,25 @@ function crearNivel(data)
 
         var explosions;
 
+        var music;
+        var musicExplosion;
+        var musicVida;
+        var audioOver;
+
+        var buttonSound;
+        var booleanSound;
+
+
         function create() {
+            
+            music = game.add.audio('audio');
+            musicExplosion = game.add.audio('audioExplosion');
+            musicVida = game.add.audio('audioVida');
+            audioOver = game.add.audio('audioOver');
+
+
+            music.play();
+
             //iniCoordenadas();
             //console.log(coord);
             game.world.setBounds(0,0,800,1200+(nivel*400));
@@ -153,6 +177,35 @@ function crearNivel(data)
 
             //  Our controls.
             cursors = game.input.keyboard.createCursorKeys();     
+
+            booleanSound=true;
+
+            buttonSound = game.add.button(game.world.width/2-16, game.world.height - 50, 'buttonSound', actionOnClick, this, 2, 1, 0);
+
+            //buttonSound.onInputOver.add(over, this);
+            //buttonSound.onInputOut.add(out, this);
+            //buttonSound.onInputUp.add(up, this);
+        }
+
+
+        function actionOnClick () {
+
+           booleanSound=!booleanSound;
+
+           if(booleanSound){
+                buttonSound.loadTexture('buttonSound');
+                game.sound.mute = false;
+           }
+           else
+           {
+                buttonSound.loadTexture('buttonSound2');
+                game.sound.mute = true;
+           }
+           
+           
+           //background.visible =! background.visible;
+
+
         }
 
        
@@ -243,16 +296,12 @@ function crearNivel(data)
             piedra.animations.add('explosion');
         }
 
-        /*function setupVida(vida){
-            piedra.anchor.x=0.5;
-            piedra.anchor.y=0.5;
-            piedra.animations.add('vida');
-        }*/
-
         function render(){
             textContador.setText('Tiempo: '+segundos);            
             game.debug.text(textContador.text,685,32, 'rgba(80,66,66,0)');
             game.debug.text(board.text,32,32, 'rgba(80,66,66,0)');
+            //game.debug.spriteCoords(buttonSound, 334,32);
+            //game.debug.soundInfo(music, 20, 32);
         }
 
         function updateContador(){
@@ -261,10 +310,10 @@ function crearNivel(data)
         }
 
         function collectmeteorito (player, meteorito) {
-            
-            // Removes the meteorito from the screen
-            //console.log('jugador con estrella');
+
             meteorito.kill();
+
+            musicExplosion.play();
 
             var explosion=explosions.getFirstExists(false);
             explosion.reset(player.body.x+16,player.body.y);
@@ -272,6 +321,8 @@ function crearNivel(data)
 
 
             player.vidas=player.vidas-1;
+            player.body.gravity.y = 300 + ((5/player.vidas)*2);
+            
             if(vidas>5){
                 player.loadTexture('dude5');
             }
@@ -280,6 +331,7 @@ function crearNivel(data)
                 player.loadTexture('dude'+player.vidas);
             }
             board.setText("Vidas: "+player.vidas);
+            
             if (player.vidas<=0)
             {
                 loSiento(player);
@@ -291,17 +343,14 @@ function crearNivel(data)
         }
 
         function collectvidas (player, vida) {
-            
-            // Removes the meteorito from the screen
-            //console.log('jugador con estrella');
+
             vida.kill();
 
-            /*var explosion=explosions.getFirstExists(false);
-            explosion.reset(player.body.x+16,player.body.y);
-            explosion.play('vida',530,false,true);*/
-
-
+            musicVida.play();
             player.vidas=player.vidas+1;
+
+            player.body.gravity.y = 300 + ((5/player.vidas)*2);
+
             if(vidas>5){
                 player.loadTexture('dude5');
             }
@@ -313,17 +362,24 @@ function crearNivel(data)
         }
 
         function loSiento(player){
+            music.pause();
+            audioOver.play();
             console.log("Has muerto!");
             board.setText("Fin del juego!");
-            board.x=game.world.width-230;
+            board.x=32;
             player.kill();
             game.time.events.remove(timer);
+            terminarVidas();
             terminarMeteoritos();
             noHayNiveles();
         }
 
         function terminarMeteoritos(){
             meteoritos.forEach(function(c) {c.kill(); });
+        }
+
+        function terminarVidas(){
+            vidas.forEach(function(c) {c.kill(); });
         }
 
         function endmeteorito (meteorito, platform) {
@@ -338,7 +394,7 @@ function crearNivel(data)
             console.log('Conseguiste completar el nivel');
             game.time.events.remove(timer);
             board.setText("Nivel completado!");
-            board.x=game.world.width-247;
+            board.x=32;
             nivelCompletado(segundos);
             //mostrarDatos(segundos, player.vidas);
             player.kill();
